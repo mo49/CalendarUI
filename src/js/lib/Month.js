@@ -12,7 +12,7 @@ export default class Month {
         const date = new Date(ds.date.year, month - 1, 1);
 
         // その月の1日が何曜日なのか / 日 ~ 土 0 ~ 6
-        const firstDayOfWeekIndex = date.getDay();
+        const firstDayOfWeekIndex = date.getDay() + info.firstDayOfWeekOffset;
 
         // その月の日数
         const dayNum = this.getMonthDays(ds.date.year, month);

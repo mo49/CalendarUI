@@ -22708,10 +22708,23 @@ var Calendar = function () {
         _DateSingleton2.default.date = opts.virtual;
         this.dd = _DateSingleton2.default.date;
 
-        this.createCalendar();
+        if (opts.firstDayOfWeekOffset) {
+            _Info2.default.firstDayOfWeekOffset = opts.firstDayOfWeekOffset;
+            for (var i = 0; i < _Info2.default.firstDayOfWeekOffset; i++) {
+                _Info2.default.label.week.unshift(_Info2.default.label.week.pop());
+            }
+        }
+
+        this.init();
     }
 
     (0, _createClass3.default)(Calendar, [{
+        key: 'init',
+        value: function init() {
+            this.$calendar.attr("data-type", this.type);
+            this.createCalendar();
+        }
+    }, {
         key: 'createCalendar',
         value: function createCalendar() {
             switch (this.type) {
@@ -22772,11 +22785,6 @@ var Calendar = function () {
     return Calendar;
 }();
 
-/*
-http://www.frontendmemo.xyz/entry/2017/02/04/044306
-*/
-
-
 Calendar.MAX_MONTH = 12;
 exports.default = Calendar;
 
@@ -22829,7 +22837,7 @@ var Month = function () {
             var date = new Date(_DateSingleton2.default.date.year, month - 1, 1);
 
             // その月の1日が何曜日なのか / 日 ~ 土 0 ~ 6
-            var firstDayOfWeekIndex = date.getDay();
+            var firstDayOfWeekIndex = date.getDay() + _Info2.default.firstDayOfWeekOffset;
 
             // その月の日数
             var dayNum = this.getMonthDays(_DateSingleton2.default.date.year, month);
@@ -22909,30 +22917,74 @@ var _Calendar2 = _interopRequireDefault(_Calendar);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
+/*
+検討
+別ブランチ
+
+new Calendarで年・月・今日をつくれるようにする
+３つのカレンダーに設定が共有されることが重要
+calendar = new Calendar({
+    // 設定はここで一回のみ
+    $yearTarget
+    $monthTarget
+    $todayTarget
+})
+calendar.createYearCalendar() みたいな
+
+カレンダーを2こ作ったときに崩壊するのでinfo.jsはだめ
+
+*/
+
 (function () {
+
     new _Calendar2.default({
-        $calendar: (0, _jquery2.default)(".calendar[data-type='year']")
-        // monthRange: 1, // 奇数のみ
-        // dayRange: 5, // 5 or 7
-        // type: 'month',
-        // virtual:{
-        //     year: 2020,
-        //     month: 10,
-        //     // today: 1,
-        // },
+        $calendar: (0, _jquery2.default)(".calendar[data-type='year']"),
+        type: 'year',
+        // monthRange: 1, // 年カレンダーの表示数（奇数のみ）
+        // dayRange: 5, // 日カレンダーの表示数（5 or 7）
+        virtual: {
+            year: 2020,
+            month: 10,
+            today: 1
+        }
         // lang:{
         //     month: 'en',
         //     // week: 'ja',
         // },
+        // firstDayOfWeekOffset: 1, // 曜日始まりが1つ右にずれる
     });
-    new _Calendar2.default({
-        $calendar: (0, _jquery2.default)(".calendar[data-type='month']"),
-        type: 'month'
+
+    // new Calendar({
+    //     $calendar: $(".calendar[data-type='year']"),
+    //     type: 'year',
+    //     virtual:{
+    //         year: 2030,
+    //         month: 12,
+    //         today: 31,
+    //     },
+    // });
+
+    // 年カレンダーの中の月をクリック
+    (0, _jquery2.default)('.calendar[data-type="year"] table').on("click", function (evt) {
+        (0, _jquery2.default)('.calendar[data-type="month"]').empty();
+        var monthIndex = evt.currentTarget.getAttribute("data-month-index");
+        new _Calendar2.default({
+            $calendar: (0, _jquery2.default)(".calendar[data-type='month']"),
+            type: 'month'
+            // 月を渡す monthIndex
+        });
     });
+
+    // 月カレンダーの中の日にちをクリック
     new _Calendar2.default({
         $calendar: (0, _jquery2.default)(".calendar[data-type='day']"),
         type: 'day'
+        // 日を渡す
     });
 })();
+
+/*
+http://www.frontendmemo.xyz/entry/2017/02/04/044306
+*/
 
 },{"./lib/Calendar":45,"jquery":41}]},{},[47]);

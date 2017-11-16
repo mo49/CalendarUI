@@ -29,6 +29,18 @@ export default class Calendar {
         DateSingleton.date = opts.virtual;
         this.dd = DateSingleton.date;
 
+        if(opts.firstDayOfWeekOffset) {
+            info.firstDayOfWeekOffset = opts.firstDayOfWeekOffset;
+            for (let i = 0; i < info.firstDayOfWeekOffset; i++) {
+                info.label.week.unshift(info.label.week.pop());
+            }
+        }
+
+        this.init();
+    }
+
+    init() {
+        this.$calendar.attr("data-type", this.type);
         this.createCalendar();
     }
 
@@ -80,7 +92,3 @@ export default class Calendar {
     }
 
 }
-
-/*
-http://www.frontendmemo.xyz/entry/2017/02/04/044306
-*/

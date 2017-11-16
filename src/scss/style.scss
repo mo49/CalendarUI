@@ -7,15 +7,42 @@
 // modules
 @import 'module/*';
 
+ *{
+     box-sizing: border-box;
+ }
+
 .calendar{
-    
+    text-align: center;
+    @include pc-layout{
+        width: 800px;
+    }
+    @include sp-layout{
+        width: 375px;
+    }
+    &[data-type="year"]{
+
+    }
+    &[data-type="month"]{
+        table{
+            font-size: 24px;
+        }
+        td{
+            // width: 50px;
+        }
+    }
 }
+
 table{
     display: inline-block;
     vertical-align: top;
     border: 1px solid #000;
     margin: 10px;
     text-align: center;
+    @include pc-layout{
+        font-size: 12px;
+    }
+    @include sp-layout{
+    }
 }
 td{
     padding: 5px;
@@ -24,6 +51,10 @@ td{
 
         }
     }
+    // 週ラベル
+    &[data-weekday-type]{
+        font-style: italic; 
+    }
     // 日
     &[data-weekday-type="0"]{
         color: red;
@@ -31,6 +62,10 @@ td{
     // 土
     &[data-weekday-type="6"]{
         color: blue;
+    }
+    // 日付部分
+    &[data-day-index]{
+        font-weight: bold;
     }
 
 }
