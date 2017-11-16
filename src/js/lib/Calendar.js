@@ -16,79 +16,77 @@ export default class Calendar {
     static MAX_MONTH = 12;
 
     constructor(opts={}) {
-        this.$calendar = opts.$calendar || $('.calendar') || $(document.createElement('div'));
-        this.type = opts.type || 'year'; // year, month, day
-
-        this.columnNum = isNaN(opts.columnNum) ? 7 : opts.columnNum;
-        this.monthRange = isNaN(opts.monthRange) ? info.monthRange : opts.monthRange;
-        this.dayRange = isNaN(opts.dayRange) ? info.dayRange : opts.dayRange;
-
-        info.label.month = opts.lang ? info.month[opts.lang.month] : info.month.ja;
-        info.label.week = opts.lang ? info.week[opts.lang.week] : info.week.en;
+        this.info = {
+            columnNum: isNaN(opts.columnNum) ? 7 : opts.columnNum,
+            monthRange: isNaN(opts.monthRange) ? null : opts.monthRange,
+            dayRange: isNaN(opts.dayRange) ? null : opts.dayRange,
+            firstDayOfWeekOffset: isNaN(opts.firstDayOfWeekOffset) ? null : opts.firstDayOfWeekOffset,
+            label: {
+                month: opts.lang ? info.month[opts.lang.month] || info.month.ja : info.month.ja,
+                week: opts.lang ? info.week[opts.lang.week] || info.week.en : info.week.en,
+            },
+        }
 
         DateSingleton.date = opts.virtual;
         this.dd = DateSingleton.date;
 
-        if(opts.firstDayOfWeekOffset) {
-            info.firstDayOfWeekOffset = opts.firstDayOfWeekOffset;
-            for (let i = 0; i < info.firstDayOfWeekOffset; i++) {
-                info.label.week.unshift(info.label.week.pop());
+        if(this.info.firstDayOfWeekOffset) {
+            for (let i = 0; i < this.info.firstDayOfWeekOffset; i++) {
+                this.info.label.week.unshift(this.info.label.week.pop());
             }
         }
-
-        this.init();
     }
 
-    init() {
-        this.$calendar.attr("data-type", this.type);
-        this.createCalendar();
-    }
-
-    createCalendar() {
-        switch (this.type) {
-            case 'year': this.createYearCalendar(); break;
-            case 'month': this.createMonthCalendar(); break;
-            case 'day': this.createDayCalendar(); break;
+    createYearCalendar($target) {
+        if(!$target){
+            return;
         }
-    }
-
-    createYearCalendar() {
-        this.insertYearLabel();
+        this.insertYearLabel($target);
         for(let i = 1; i <= Calendar.MAX_MONTH; i++) {
-            if(this.monthRange){
-                let offset = Math.floor(this.monthRange/2);
+            if(this.info.monthRange){
+                let offset = Math.floor(this.info.monthRange/2);
                 if(_.inRange(i, this.dd.month - offset, this.dd.month + offset + 1)){
-                    this.insertMonth(i);
+                    this.insertMonth($target, i);
                 }
                 continue;
             }
-            this.insertMonth(i);
+            this.insertMonth($target, i);
         }
     }
 
-    createMonthCalendar() {
-        this.insertYearLabel();
-        this.insertMonth(this.dd.month);
+    createMonthCalendar($target, monthIndex) {
+        if(!$target){
+            return;
+        }
+        $target.empty();
+        this.insertYearLabel($target);
+        this.insertMonth($target, monthIndex);
     }
 
-    createDayCalendar() {
+    createDayCalendar($target) {
+        if(!$target){
+            return;
+        }
         // 必ずしもcolumnは7ではないので、weekではなくone-linerと命名
-        this.insertOneLiner();
+        this.insertOneLiner($target);
     }
 
-    insertYearLabel() {
-        this.$calendar.append($(`<p class='calendar__year'>${this.dd.year}</p>`));
+    insertYearLabel($target) {
+        $target.append($(`<p class='calendar__year'>${this.dd.year}</p>`));
     }
 
-    insertMonth(index) {
-        const monthTable = new Month().createMonth(index);
-        this.$calendar.append(monthTable);
+    insertMonth($target, index) {
+        const month = new Month({
+            info: this.info,
+        })
+        const monthTable = month.createMonth(index);
+        $target.append(monthTable);
     }
 
-    insertOneLiner() {
+    insertOneLiner($target) {
         // const oneLiner = new OneLiner({})
         // const oneLinerTable = oneLiner.createOneLiner(info.dayRange);
-        // this.$calendar.append(oneLinerTable);
+        // $target.append(oneLinerTable);
     }
 
 }

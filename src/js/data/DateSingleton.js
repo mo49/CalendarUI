@@ -1,5 +1,10 @@
 import _ from 'lodash';
 
+/**
+ * カレンダーを複数つくったとしても、
+ * "今"という瞬間はユニークなのでシングルトン
+ */
+
 class DateSingleton {
 
     static MAX_MONTH = 12;

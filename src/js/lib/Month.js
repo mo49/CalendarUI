@@ -1,18 +1,18 @@
 import $ from 'jquery';
 import _ from 'lodash';
-import info from '../data/Info';
 import ds from '../data/DateSingleton';
 
 export default class Month {
     constructor(opts={}) {
-
+        this.info = opts.info || null;
+        console.log(this.info);
     }
 
     createMonth(month) {
         const date = new Date(ds.date.year, month - 1, 1);
 
         // その月の1日が何曜日なのか / 日 ~ 土 0 ~ 6
-        const firstDayOfWeekIndex = date.getDay() + info.firstDayOfWeekOffset;
+        const firstDayOfWeekIndex = date.getDay() + this.info.firstDayOfWeekOffset;
 
         // その月の日数
         const dayNum = this.getMonthDays(ds.date.year, month);
@@ -21,7 +21,7 @@ export default class Month {
         const rowNum = this.getMonthRows(firstDayOfWeekIndex, dayNum);
 
         // その月のすべてのセル（空も含める）
-        let cells = new Array(rowNum * info.columnNum);
+        let cells = new Array(rowNum * this.info.columnNum);
         // 日付を入れる
         for(let i = 0; i < dayNum; i++) {
             cells[i+firstDayOfWeekIndex] = i+1;
@@ -37,8 +37,8 @@ export default class Month {
 
         for(let i = 0; i < rowNum; i++) {
             let $tr = $(`<tr data-row-index="${i+1}"></tr>`);
-            for(let j = 0; j < info.columnNum; j++) {
-                let day = cells[j+(i*info.columnNum)];
+            for(let j = 0; j < this.info.columnNum; j++) {
+                let day = cells[j+(i*this.info.columnNum)];
                 let $td = day 
                     ? $(`<td data-day-index="${day}">${day}</td>`)
                     : $(`<td></td>`);
@@ -52,14 +52,14 @@ export default class Month {
     insertMonthLabel($table, month) {
         $table.append(
             $(`<tr data-month-index="${month}">
-                <td colspan="${info.columnNum}">${info.label.month[month-1]}</td>
+                <td colspan="${this.info.columnNum}">${this.info.label.month[month-1]}</td>
             </tr>`)
         );
     }
 
     insertWeekLabel($table) {
         let $tr = $(`<tr></tr>`);
-        _.each(info.label.week, (elm,index) => {
+        _.each(this.info.label.week, (elm,index) => {
             let key = Object.keys(elm)[0];
             $tr.append(
                 $(`<td data-weekday-type="${key}">${elm[key]}</td>`)
@@ -74,7 +74,7 @@ export default class Month {
 
     getMonthRows(firstDayOfWeekIndex, dayNum) {
         // row = ceil ( その月の1日のオフセット ＋ その月の日数 / 列数 )
-        return Math.ceil((firstDayOfWeekIndex + dayNum) / info.columnNum);
+        return Math.ceil((firstDayOfWeekIndex + dayNum) / this.info.columnNum);
     }
 
 }

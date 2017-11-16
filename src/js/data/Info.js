@@ -1,5 +1,4 @@
 module.exports = {
-    // 順番変わることはない
     month:{
         ja: [
             '1月',
@@ -30,7 +29,6 @@ module.exports = {
             'December'
         ],
     },
-    // 順番変わることはありうる
     week:{
         ja: [
             { 0: '日' },
@@ -50,13 +48,5 @@ module.exports = {
             { 5: 'Fri' },
             { 6: 'Sat' }
         ],
-    },
-    label:{
-        month:{},
-        week:{}
-    },
-    columnNum: 7,
-    monthRange: null,
-    dayRange: null,
-    firstDayOfWeekOffset: 0,
+    }
 }

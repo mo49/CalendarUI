@@ -22575,6 +22575,11 @@ var _lodash2 = _interopRequireDefault(_lodash);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
+/**
+ * カレンダーを複数つくったとしても、
+ * "今"という瞬間はユニークなのでシングルトン
+ */
+
 var DateSingleton = function () {
     function DateSingleton() {
         (0, _classCallCheck3.default)(this, DateSingleton);
@@ -22626,24 +22631,14 @@ exports.default = new DateSingleton();
 'use strict';
 
 module.exports = {
-    // 順番変わることはない
     month: {
         ja: ['1月', '2月', '3月', '4月', '5月', '6月', '7月', '8月', '9月', '10月', '11月', '12月'],
         en: ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
     },
-    // 順番変わることはありうる
     week: {
         ja: [{ 0: '日' }, { 1: '月' }, { 2: '火' }, { 3: '水' }, { 4: '木' }, { 5: '金' }, { 6: '土' }],
         en: [{ 0: 'Sun' }, { 1: 'Mon' }, { 2: 'Tue' }, { 3: 'Wed' }, { 4: 'Thu' }, { 5: 'Fri' }, { 6: 'Sat' }]
-    },
-    label: {
-        month: {},
-        week: {}
-    },
-    columnNum: 7,
-    monthRange: null,
-    dayRange: null,
-    firstDayOfWeekOffset: 0
+    }
 };
 
 },{}],45:[function(require,module,exports){
@@ -22695,91 +22690,84 @@ var Calendar = function () {
         var opts = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
         (0, _classCallCheck3.default)(this, Calendar);
 
-        this.$calendar = opts.$calendar || (0, _jquery2.default)('.calendar') || (0, _jquery2.default)(document.createElement('div'));
-        this.type = opts.type || 'year'; // year, month, day
-
-        this.columnNum = isNaN(opts.columnNum) ? 7 : opts.columnNum;
-        this.monthRange = isNaN(opts.monthRange) ? _Info2.default.monthRange : opts.monthRange;
-        this.dayRange = isNaN(opts.dayRange) ? _Info2.default.dayRange : opts.dayRange;
-
-        _Info2.default.label.month = opts.lang ? _Info2.default.month[opts.lang.month] : _Info2.default.month.ja;
-        _Info2.default.label.week = opts.lang ? _Info2.default.week[opts.lang.week] : _Info2.default.week.en;
+        this.info = {
+            columnNum: isNaN(opts.columnNum) ? 7 : opts.columnNum,
+            monthRange: isNaN(opts.monthRange) ? null : opts.monthRange,
+            dayRange: isNaN(opts.dayRange) ? null : opts.dayRange,
+            firstDayOfWeekOffset: isNaN(opts.firstDayOfWeekOffset) ? null : opts.firstDayOfWeekOffset,
+            label: {
+                month: opts.lang ? _Info2.default.month[opts.lang.month] || _Info2.default.month.ja : _Info2.default.month.ja,
+                week: opts.lang ? _Info2.default.week[opts.lang.week] || _Info2.default.week.en : _Info2.default.week.en
+            }
+        };
 
         _DateSingleton2.default.date = opts.virtual;
         this.dd = _DateSingleton2.default.date;
 
-        if (opts.firstDayOfWeekOffset) {
-            _Info2.default.firstDayOfWeekOffset = opts.firstDayOfWeekOffset;
-            for (var i = 0; i < _Info2.default.firstDayOfWeekOffset; i++) {
-                _Info2.default.label.week.unshift(_Info2.default.label.week.pop());
+        if (this.info.firstDayOfWeekOffset) {
+            for (var i = 0; i < this.info.firstDayOfWeekOffset; i++) {
+                this.info.label.week.unshift(this.info.label.week.pop());
             }
         }
-
-        this.init();
     }
 
     (0, _createClass3.default)(Calendar, [{
-        key: 'init',
-        value: function init() {
-            this.$calendar.attr("data-type", this.type);
-            this.createCalendar();
-        }
-    }, {
-        key: 'createCalendar',
-        value: function createCalendar() {
-            switch (this.type) {
-                case 'year':
-                    this.createYearCalendar();break;
-                case 'month':
-                    this.createMonthCalendar();break;
-                case 'day':
-                    this.createDayCalendar();break;
-            }
-        }
-    }, {
         key: 'createYearCalendar',
-        value: function createYearCalendar() {
-            this.insertYearLabel();
+        value: function createYearCalendar($target) {
+            if (!$target) {
+                return;
+            }
+            this.insertYearLabel($target);
             for (var i = 1; i <= Calendar.MAX_MONTH; i++) {
-                if (this.monthRange) {
-                    var offset = Math.floor(this.monthRange / 2);
+                if (this.info.monthRange) {
+                    var offset = Math.floor(this.info.monthRange / 2);
                     if (_lodash2.default.inRange(i, this.dd.month - offset, this.dd.month + offset + 1)) {
-                        this.insertMonth(i);
+                        this.insertMonth($target, i);
                     }
                     continue;
                 }
-                this.insertMonth(i);
+                this.insertMonth($target, i);
             }
         }
     }, {
         key: 'createMonthCalendar',
-        value: function createMonthCalendar() {
-            this.insertYearLabel();
-            this.insertMonth(this.dd.month);
+        value: function createMonthCalendar($target, monthIndex) {
+            if (!$target) {
+                return;
+            }
+            $target.empty();
+            this.insertYearLabel($target);
+            this.insertMonth($target, monthIndex);
         }
     }, {
         key: 'createDayCalendar',
-        value: function createDayCalendar() {
+        value: function createDayCalendar($target) {
+            if (!$target) {
+                return;
+            }
             // 必ずしもcolumnは7ではないので、weekではなくone-linerと命名
-            this.insertOneLiner();
+            this.insertOneLiner($target);
         }
     }, {
         key: 'insertYearLabel',
-        value: function insertYearLabel() {
-            this.$calendar.append((0, _jquery2.default)('<p class=\'calendar__year\'>' + this.dd.year + '</p>'));
+        value: function insertYearLabel($target) {
+            $target.append((0, _jquery2.default)('<p class=\'calendar__year\'>' + this.dd.year + '</p>'));
         }
     }, {
         key: 'insertMonth',
-        value: function insertMonth(index) {
-            var monthTable = new _Month2.default().createMonth(index);
-            this.$calendar.append(monthTable);
+        value: function insertMonth($target, index) {
+            var month = new _Month2.default({
+                info: this.info
+            });
+            var monthTable = month.createMonth(index);
+            $target.append(monthTable);
         }
     }, {
         key: 'insertOneLiner',
-        value: function insertOneLiner() {
+        value: function insertOneLiner($target) {
             // const oneLiner = new OneLiner({})
             // const oneLinerTable = oneLiner.createOneLiner(info.dayRange);
-            // this.$calendar.append(oneLinerTable);
+            // $target.append(oneLinerTable);
         }
     }]);
     return Calendar;
@@ -22815,10 +22803,6 @@ var _lodash = require('lodash');
 
 var _lodash2 = _interopRequireDefault(_lodash);
 
-var _Info = require('../data/Info');
-
-var _Info2 = _interopRequireDefault(_Info);
-
 var _DateSingleton = require('../data/DateSingleton');
 
 var _DateSingleton2 = _interopRequireDefault(_DateSingleton);
@@ -22829,6 +22813,9 @@ var Month = function () {
     function Month() {
         var opts = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
         (0, _classCallCheck3.default)(this, Month);
+
+        this.info = opts.info || null;
+        console.log(this.info);
     }
 
     (0, _createClass3.default)(Month, [{
@@ -22837,7 +22824,7 @@ var Month = function () {
             var date = new Date(_DateSingleton2.default.date.year, month - 1, 1);
 
             // その月の1日が何曜日なのか / 日 ~ 土 0 ~ 6
-            var firstDayOfWeekIndex = date.getDay() + _Info2.default.firstDayOfWeekOffset;
+            var firstDayOfWeekIndex = date.getDay() + this.info.firstDayOfWeekOffset;
 
             // その月の日数
             var dayNum = this.getMonthDays(_DateSingleton2.default.date.year, month);
@@ -22846,7 +22833,7 @@ var Month = function () {
             var rowNum = this.getMonthRows(firstDayOfWeekIndex, dayNum);
 
             // その月のすべてのセル（空も含める）
-            var cells = new Array(rowNum * _Info2.default.columnNum);
+            var cells = new Array(rowNum * this.info.columnNum);
             // 日付を入れる
             for (var i = 0; i < dayNum; i++) {
                 cells[i + firstDayOfWeekIndex] = i + 1;
@@ -22863,8 +22850,8 @@ var Month = function () {
 
             for (var i = 0; i < rowNum; i++) {
                 var $tr = (0, _jquery2.default)('<tr data-row-index="' + (i + 1) + '"></tr>');
-                for (var j = 0; j < _Info2.default.columnNum; j++) {
-                    var day = cells[j + i * _Info2.default.columnNum];
+                for (var j = 0; j < this.info.columnNum; j++) {
+                    var day = cells[j + i * this.info.columnNum];
                     var $td = day ? (0, _jquery2.default)('<td data-day-index="' + day + '">' + day + '</td>') : (0, _jquery2.default)('<td></td>');
                     $tr.append($td);
                 }
@@ -22875,13 +22862,13 @@ var Month = function () {
     }, {
         key: 'insertMonthLabel',
         value: function insertMonthLabel($table, month) {
-            $table.append((0, _jquery2.default)('<tr data-month-index="' + month + '">\n                <td colspan="' + _Info2.default.columnNum + '">' + _Info2.default.label.month[month - 1] + '</td>\n            </tr>'));
+            $table.append((0, _jquery2.default)('<tr data-month-index="' + month + '">\n                <td colspan="' + this.info.columnNum + '">' + this.info.label.month[month - 1] + '</td>\n            </tr>'));
         }
     }, {
         key: 'insertWeekLabel',
         value: function insertWeekLabel($table) {
             var $tr = (0, _jquery2.default)('<tr></tr>');
-            _lodash2.default.each(_Info2.default.label.week, function (elm, index) {
+            _lodash2.default.each(this.info.label.week, function (elm, index) {
                 var key = (0, _keys2.default)(elm)[0];
                 $tr.append((0, _jquery2.default)('<td data-weekday-type="' + key + '">' + elm[key] + '</td>'));
             });
@@ -22896,7 +22883,7 @@ var Month = function () {
         key: 'getMonthRows',
         value: function getMonthRows(firstDayOfWeekIndex, dayNum) {
             // row = ceil ( その月の1日のオフセット ＋ その月の日数 / 列数 )
-            return Math.ceil((firstDayOfWeekIndex + dayNum) / _Info2.default.columnNum);
+            return Math.ceil((firstDayOfWeekIndex + dayNum) / this.info.columnNum);
         }
     }]);
     return Month;
@@ -22904,7 +22891,7 @@ var Month = function () {
 
 exports.default = Month;
 
-},{"../data/DateSingleton":43,"../data/Info":44,"babel-runtime/core-js/object/keys":2,"babel-runtime/helpers/classCallCheck":3,"babel-runtime/helpers/createClass":4,"jquery":41,"lodash":42}],47:[function(require,module,exports){
+},{"../data/DateSingleton":43,"babel-runtime/core-js/object/keys":2,"babel-runtime/helpers/classCallCheck":3,"babel-runtime/helpers/createClass":4,"jquery":41,"lodash":42}],47:[function(require,module,exports){
 'use strict';
 
 var _jquery = require('jquery');
@@ -22938,50 +22925,35 @@ calendar.createYearCalendar() みたいな
 
 (function () {
 
-    new _Calendar2.default({
-        $calendar: (0, _jquery2.default)(".calendar[data-type='year']"),
-        type: 'year',
+    var calendar = new _Calendar2.default({
+        $calendar: (0, _jquery2.default)(".calendar[data-type='year']")
         // monthRange: 1, // 年カレンダーの表示数（奇数のみ）
         // dayRange: 5, // 日カレンダーの表示数（5 or 7）
-        virtual: {
-            year: 2020,
-            month: 10,
-            today: 1
-        }
+        // virtual:{
+        //     year: 2020,
+        //     month: 10,
+        //     today: 1,
+        // },
         // lang:{
         //     month: 'en',
         //     // week: 'ja',
         // },
         // firstDayOfWeekOffset: 1, // 曜日始まりが1つ右にずれる
     });
-
-    // new Calendar({
-    //     $calendar: $(".calendar[data-type='year']"),
-    //     type: 'year',
-    //     virtual:{
-    //         year: 2030,
-    //         month: 12,
-    //         today: 31,
-    //     },
-    // });
+    calendar.createYearCalendar((0, _jquery2.default)('.calendar[data-type="year"]'));
 
     // 年カレンダーの中の月をクリック
     (0, _jquery2.default)('.calendar[data-type="year"] table').on("click", function (evt) {
-        (0, _jquery2.default)('.calendar[data-type="month"]').empty();
         var monthIndex = evt.currentTarget.getAttribute("data-month-index");
-        new _Calendar2.default({
-            $calendar: (0, _jquery2.default)(".calendar[data-type='month']"),
-            type: 'month'
-            // 月を渡す monthIndex
-        });
+        calendar.createMonthCalendar((0, _jquery2.default)('.calendar[data-type="month"]'), monthIndex);
     });
 
     // 月カレンダーの中の日にちをクリック
-    new _Calendar2.default({
-        $calendar: (0, _jquery2.default)(".calendar[data-type='day']"),
-        type: 'day'
-        // 日を渡す
-    });
+    // new Calendar({
+    //     $calendar: $(".calendar[data-type='day']"),
+    //     type: 'day',
+    //     // 日を渡す
+    // });
 })();
 
 /*
