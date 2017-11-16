@@ -22427,6 +22427,69 @@ var _createClass2 = require('babel-runtime/helpers/createClass');
 
 var _createClass3 = _interopRequireDefault(_createClass2);
 
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+var LABELS = {
+    month: {
+        ja: ['1月', '2月', '3月', '4月', '5月', '6月', '7月', '8月', '9月', '10月', '11月', '12月'],
+        en: ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
+    },
+    week: {
+        ja: ['日', '月', '火', '水', '木', '金', '土'],
+        en: ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
+    }
+};
+
+var LabelSingleton = function () {
+    function LabelSingleton() {
+        (0, _classCallCheck3.default)(this, LabelSingleton);
+
+        this._month = LABELS.month.ja;
+        this._week = LABELS.week.ja;
+        console.log("generate LabelSingleton instance.");
+    }
+
+    (0, _createClass3.default)(LabelSingleton, [{
+        key: 'month',
+        set: function set(_lang) {
+            this._month = LABELS.month[_lang];
+            console.log("set month : ", this.month);
+        },
+        get: function get() {
+            console.log("get month : ", this._month);
+            return this._month;
+        }
+    }, {
+        key: 'week',
+        set: function set(_lang) {
+            this._week = LABELS.week[_lang];
+            console.log("set week : ", this.week);
+        },
+        get: function get() {
+            console.log("get week : ", this._week);
+            return this._week;
+        }
+    }]);
+    return LabelSingleton;
+}();
+
+exports.default = new LabelSingleton();
+
+},{"babel-runtime/helpers/classCallCheck":2,"babel-runtime/helpers/createClass":3}],25:[function(require,module,exports){
+'use strict';
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+
+var _classCallCheck2 = require('babel-runtime/helpers/classCallCheck');
+
+var _classCallCheck3 = _interopRequireDefault(_classCallCheck2);
+
+var _createClass2 = require('babel-runtime/helpers/createClass');
+
+var _createClass3 = _interopRequireDefault(_createClass2);
+
 var _jquery = require('jquery');
 
 var _jquery2 = _interopRequireDefault(_jquery);
@@ -22443,6 +22506,10 @@ var _Month = require('./Month');
 
 var _Month2 = _interopRequireDefault(_Month);
 
+var _LabelSingleton = require('../data/LabelSingleton');
+
+var _LabelSingleton2 = _interopRequireDefault(_LabelSingleton);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 /*
@@ -22454,7 +22521,6 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 
 /*
 TODO: 
-githubにcalendar_uiリポジトリつくる
 DateとLabelをSingletonにして複数クラスから参照できるようにする
 値のセットはCalendarクラスのコンストラクタの中で行う
 */
@@ -22468,11 +22534,13 @@ var Calendar = function () {
         this.type = opts.type || 'year'; // year, month, day
 
         this.setDate(opts.virtual);
-        this.setWeekLabel(opts.lang);
 
         this.columnNum = isNaN(opts.columnNum) ? 7 : opts.columnNum;
         this.monthRange = isNaN(opts.monthRange) ? null : opts.monthRange;
         this.dayRange = isNaN(opts.dayRange) ? null : opts.dayRange;
+
+        _LabelSingleton2.default.month = opts.lang ? opts.lang.month || 'ja' : 'ja';
+        _LabelSingleton2.default.week = opts.lang ? opts.lang.week || 'en' : 'en';
 
         this.createCalendar();
     }
@@ -22482,7 +22550,7 @@ var Calendar = function () {
         value: function setDate(virtual) {
             if (
             // YYYY/MM/DD がすべてあれば仮想の日時を設定
-            /^[0-9]{4}$/.test(virtual.year) && _lodash2.default.inRange(virtual.month, 1, Calendar.MAX_MONTH + 1) && _lodash2.default.inRange(virtual.today, 1, Calendar.MAX_DAY + 1)) {
+            virtual && /^[0-9]{4}$/.test(virtual.year) && _lodash2.default.inRange(virtual.month, 1, Calendar.MAX_MONTH + 1) && _lodash2.default.inRange(virtual.today, 1, Calendar.MAX_DAY + 1)) {
                 this.year = virtual.year;
                 this.month = virtual.month;
                 this.today = virtual.today;
@@ -22492,20 +22560,6 @@ var Calendar = function () {
                 this.year = this.date.getFullYear();
                 this.month = this.date.getMonth() + 1;
                 this.today = this.date.getDate();
-            }
-        }
-    }, {
-        key: 'setWeekLabel',
-        value: function setWeekLabel() {
-            var lang = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 'ja';
-
-            switch (lang) {
-                case 'ja':
-                    this.weekLabel = _label2.default.week.ja;
-                    break;
-                case 'en':
-                    this.weekLabel = _label2.default.week.en;
-                    break;
             }
         }
     }, {
@@ -22577,7 +22631,7 @@ Calendar.MAX_MONTH = 12;
 Calendar.MAX_DAY = 31;
 exports.default = Calendar;
 
-},{"../config/label":23,"./Month":25,"babel-runtime/helpers/classCallCheck":2,"babel-runtime/helpers/createClass":3,"jquery":21,"lodash":22}],25:[function(require,module,exports){
+},{"../config/label":23,"../data/LabelSingleton":24,"./Month":26,"babel-runtime/helpers/classCallCheck":2,"babel-runtime/helpers/createClass":3,"jquery":21,"lodash":22}],26:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -22604,6 +22658,10 @@ var _label = require('../config/label');
 
 var _label2 = _interopRequireDefault(_label);
 
+var _LabelSingleton = require('../data/LabelSingleton');
+
+var _LabelSingleton2 = _interopRequireDefault(_LabelSingleton);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 var Month = function () {
@@ -22617,6 +22675,8 @@ var Month = function () {
         this.today = this.date.getDate();
 
         this.columnNum = opts.columnNum;
+
+        // LabelSingleton.month;
     }
 
     (0, _createClass3.default)(Month, [{
@@ -22685,7 +22745,7 @@ var Month = function () {
 
 exports.default = Month;
 
-},{"../config/label":23,"babel-runtime/helpers/classCallCheck":2,"babel-runtime/helpers/createClass":3,"jquery":21,"lodash":22}],26:[function(require,module,exports){
+},{"../config/label":23,"../data/LabelSingleton":24,"babel-runtime/helpers/classCallCheck":2,"babel-runtime/helpers/createClass":3,"jquery":21,"lodash":22}],27:[function(require,module,exports){
 'use strict';
 
 var _jquery = require('jquery');
@@ -22704,12 +22764,16 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
         // monthRange: 1, // 奇数のみ
         // dayRange: 5, // 5 or 7
         // type: 'month',
-        virtual: {
-            year: 2018,
-            month: 10
-            // today: 1,
-        }
+        // virtual:{
+        //     year: 2020,
+        //     month: 10,
+        //     // today: 1,
+        // },
+        // lang:{
+        //     month: 'en',
+        //     // week: 'ja',
+        // },
     });
 })();
 
-},{"./lib/Calendar":24,"jquery":21}]},{},[26]);
+},{"./lib/Calendar":25,"jquery":21}]},{},[27]);

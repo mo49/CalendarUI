@@ -1,6 +1,8 @@
 import $ from 'jquery';
 import _ from 'lodash';
 import label from '../config/label';
+import LabelSingleton from '../data/LabelSingleton';
+
 
 export default class Month {
     constructor(opts={}) {
@@ -10,6 +12,8 @@ export default class Month {
         this.today = this.date.getDate();
 
         this.columnNum = opts.columnNum;
+
+        // LabelSingleton.month;
     }
 
     createMonth(month) {

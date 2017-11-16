@@ -2,6 +2,7 @@ import $ from 'jquery';
 import _ from 'lodash';
 import label from '../config/label';
 import Month from './Month';
+import LabelSingleton from '../data/LabelSingleton';
 
 /*
 [機能]
@@ -12,7 +13,6 @@ import Month from './Month';
 
 /*
 TODO: 
-githubにcalendar_uiリポジトリつくる
 DateとLabelをSingletonにして複数クラスから参照できるようにする
 値のセットはCalendarクラスのコンストラクタの中で行う
 */
@@ -27,11 +27,13 @@ export default class Calendar {
         this.type = opts.type || 'year'; // year, month, day
 
         this.setDate(opts.virtual);
-        this.setWeekLabel(opts.lang);
 
         this.columnNum = isNaN(opts.columnNum) ? 7 : opts.columnNum;
         this.monthRange = isNaN(opts.monthRange) ? null : opts.monthRange;
         this.dayRange = isNaN(opts.dayRange) ? null : opts.dayRange;
+
+        LabelSingleton.month = opts.lang ? opts.lang.month || 'ja' : 'ja';
+        LabelSingleton.week = opts.lang ? opts.lang.week || 'en' : 'en';
 
         this.createCalendar();
     }
@@ -39,6 +41,7 @@ export default class Calendar {
     setDate(virtual) {
         if(
             // YYYY/MM/DD がすべてあれば仮想の日時を設定
+            virtual &&
             (/^[0-9]{4}$/).test(virtual.year) &&
             _.inRange(virtual.month, 1, Calendar.MAX_MONTH + 1) &&
             _.inRange(virtual.today, 1, Calendar.MAX_DAY + 1)
@@ -52,17 +55,6 @@ export default class Calendar {
             this.year = this.date.getFullYear();
             this.month = this.date.getMonth() + 1;
             this.today = this.date.getDate();
-        }
-    }
-
-    setWeekLabel(lang = 'ja') {
-        switch(lang) {
-            case 'ja':
-                this.weekLabel = label.week.ja;
-                break;
-            case 'en':
-                this.weekLabel = label.week.en;
-                break;
         }
     }
 

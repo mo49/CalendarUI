@@ -7,10 +7,14 @@ import Calendar from './lib/Calendar';
         // monthRange: 1, // 奇数のみ
         // dayRange: 5, // 5 or 7
         // type: 'month',
-        virtual:{
-            year: 2018,
-            month: 10,
-            // today: 1,
-        }
+        // virtual:{
+        //     year: 2020,
+        //     month: 10,
+        //     // today: 1,
+        // },
+        // lang:{
+        //     month: 'en',
+        //     // week: 'ja',
+        // },
     });
 })()
