@@ -67,7 +67,9 @@ td{
     &[data-day-index]{
         font-weight: bold;
     }
-
+    &.is-today{
+        background-color: skyblue;
+    }
 }
 
 

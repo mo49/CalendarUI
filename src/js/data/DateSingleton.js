@@ -13,7 +13,6 @@ class DateSingleton {
     constructor() {
         console.log("generate DateSingleton instance.");
         this._date  = null
-        this._base  = null;
         this._year  = null;
         this._month = null;
         this._today = null;
@@ -30,25 +29,28 @@ class DateSingleton {
             this._year = _virtual.year;
             this._month = _virtual.month;
             this._today = _virtual.today;
-            this._base = new Date(this._year, this._month - 1, this._today);
+            this._date = new Date(this._year, this._month - 1, this._today);
         } else {
-            this._base = new Date();
-            this._year = this._base.getFullYear();
-            this._month = this._base.getMonth() + 1;
-            this._today = this._base.getDate();
-        }
-
-        this._date = {
-            date: this._base,
-            year: this._year,
-            month: this._month,
-            today: this._today,
+            this._date = new Date();
+            this._year = this._date.getFullYear();
+            this._month = this._date.getMonth() + 1;
+            this._today = this._date.getDate();
         }
     }
 
     get date() {
         return this._date;
     }
+    get year() {
+        return this._year;
+    }
+    get month() {
+        return this._month;
+    }
+    get today() {
+        return this._today;
+    }
+
 }
 
 export default new DateSingleton();

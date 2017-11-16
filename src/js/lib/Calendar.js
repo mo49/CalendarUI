@@ -1,7 +1,7 @@
 import $ from 'jquery';
 import _ from 'lodash';
 import info from '../data/Info';
-import DateSingleton from '../data/DateSingleton';
+import ds from '../data/DateSingleton';
 import Month from './Month';
 
 /*
@@ -16,8 +16,7 @@ export default class Calendar {
     static MAX_MONTH = 12;
 
     constructor(opts={}) {
-        DateSingleton.date = opts.virtual;
-        this.dd = DateSingleton.date;
+        ds.date = opts.virtual;
         
         this.info = {
             columnNum: isNaN(opts.columnNum) ? 7 : opts.columnNum,
@@ -45,7 +44,7 @@ export default class Calendar {
         for(let i = 1; i <= Calendar.MAX_MONTH; i++) {
             if(this.info.monthRange){
                 let offset = Math.floor(this.info.monthRange/2);
-                if(_.inRange(i, this.dd.month - offset, this.dd.month + offset + 1)){
+                if(_.inRange(i, ds.month - offset, ds.month + offset + 1)){
                     this.insertMonth($target, i);
                 }
                 continue;
@@ -72,7 +71,7 @@ export default class Calendar {
     }
 
     insertYearLabel($target) {
-        $target.append($(`<p class='calendar__year'>${this.dd.year}</p>`));
+        $target.append($(`<p class='calendar__year'>${ds.year}</p>`));
     }
 
     insertMonth($target, index) {

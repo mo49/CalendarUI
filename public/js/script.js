@@ -22655,7 +22655,6 @@ var DateSingleton = function () {
 
         console.log("generate DateSingleton instance.");
         this._date = null;
-        this._base = null;
         this._year = null;
         this._month = null;
         this._today = null;
@@ -22670,23 +22669,31 @@ var DateSingleton = function () {
                 this._year = _virtual.year;
                 this._month = _virtual.month;
                 this._today = _virtual.today;
-                this._base = new Date(this._year, this._month - 1, this._today);
+                this._date = new Date(this._year, this._month - 1, this._today);
             } else {
-                this._base = new Date();
-                this._year = this._base.getFullYear();
-                this._month = this._base.getMonth() + 1;
-                this._today = this._base.getDate();
+                this._date = new Date();
+                this._year = this._date.getFullYear();
+                this._month = this._date.getMonth() + 1;
+                this._today = this._date.getDate();
             }
-
-            this._date = {
-                date: this._base,
-                year: this._year,
-                month: this._month,
-                today: this._today
-            };
         },
         get: function get() {
             return this._date;
+        }
+    }, {
+        key: "year",
+        get: function get() {
+            return this._year;
+        }
+    }, {
+        key: "month",
+        get: function get() {
+            return this._month;
+        }
+    }, {
+        key: "today",
+        get: function get() {
+            return this._today;
         }
     }]);
     return DateSingleton;
@@ -22770,7 +22777,6 @@ var Calendar = function () {
         (0, _classCallCheck3.default)(this, Calendar);
 
         _DateSingleton2.default.date = opts.virtual;
-        this.dd = _DateSingleton2.default.date;
 
         this.info = {
             columnNum: isNaN(opts.columnNum) ? 7 : opts.columnNum,
@@ -22800,7 +22806,7 @@ var Calendar = function () {
             for (var i = 1; i <= Calendar.MAX_MONTH; i++) {
                 if (this.info.monthRange) {
                     var offset = Math.floor(this.info.monthRange / 2);
-                    if (_lodash2.default.inRange(i, this.dd.month - offset, this.dd.month + offset + 1)) {
+                    if (_lodash2.default.inRange(i, _DateSingleton2.default.month - offset, _DateSingleton2.default.month + offset + 1)) {
                         this.insertMonth($target, i);
                     }
                     continue;
@@ -22830,7 +22836,7 @@ var Calendar = function () {
     }, {
         key: 'insertYearLabel',
         value: function insertYearLabel($target) {
-            $target.append((0, _jquery2.default)('<p class=\'calendar__year\'>' + this.dd.year + '</p>'));
+            $target.append((0, _jquery2.default)('<p class=\'calendar__year\'>' + _DateSingleton2.default.year + '</p>'));
         }
     }, {
         key: 'insertMonth',
@@ -22888,7 +22894,7 @@ var CalendarManager = function () {
         value: function init() {
             var calendar = new _Calendar2.default({
                 $calendar: (0, _jquery2.default)(".calendar[data-type='year']")
-                // monthRange: 1, // 年カレンダーの表示数（奇数のみ）
+                // monthRange: 5, // 年カレンダーの表示数（奇数のみ）
                 // dayRange: 5, // 日カレンダーの表示数（5 or 7）
                 // virtual:{
                 //     year: 2020,
@@ -22905,7 +22911,7 @@ var CalendarManager = function () {
 
             // 年カレンダーの中の月をクリック
             (0, _jquery2.default)('.calendar[data-type="year"] table').on("click", function (evt) {
-                var monthIndex = evt.currentTarget.getAttribute("data-month-index");
+                var monthIndex = evt.currentTarget.getAttribute("data-month-index") | 0;
                 calendar.createMonthCalendar((0, _jquery2.default)('.calendar[data-type="month"]'), monthIndex);
             });
 
@@ -22924,6 +22930,7 @@ module.exports = new CalendarManager();
 
 /*
 http://www.frontendmemo.xyz/entry/2017/02/04/044306
+http://phiary.me/js-get-month-days/
 */
 
 },{"./Calendar":49,"babel-runtime/helpers/classCallCheck":4,"babel-runtime/helpers/createClass":5,"jquery":45}],51:[function(require,module,exports){
@@ -22971,13 +22978,13 @@ var Month = function () {
     (0, _createClass3.default)(Month, [{
         key: 'createMonth',
         value: function createMonth(month) {
-            var date = new Date(_DateSingleton2.default.date.year, month - 1, 1);
+            var date = new Date(_DateSingleton2.default.year, month - 1, 1);
 
             // その月の1日が何曜日なのか / 日 ~ 土 0 ~ 6
             var firstDayOfWeekIndex = date.getDay() + this.info.firstDayOfWeekOffset;
 
             // その月の日数
-            var dayNum = this.getMonthDays(_DateSingleton2.default.date.year, month);
+            var dayNum = this.getMonthDays(_DateSingleton2.default.year, month);
 
             // その月の行数
             var rowNum = this.getMonthRows(firstDayOfWeekIndex, dayNum);
@@ -23003,6 +23010,9 @@ var Month = function () {
                 for (var j = 0; j < this.info.columnNum; j++) {
                     var day = cells[j + i * this.info.columnNum];
                     var $td = day ? (0, _jquery2.default)('<td data-day-index="' + day + '">' + day + '</td>') : (0, _jquery2.default)('<td></td>');
+                    if (month === _DateSingleton2.default.month && day === _DateSingleton2.default.today) {
+                        $td.addClass("is-today");
+                    }
                     $tr.append($td);
                 }
                 $table.append($tr);

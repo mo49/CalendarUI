@@ -85,3 +85,5 @@ td {
     color: blue; }
   td[data-day-index] {
     font-weight: bold; }
+  td.is-today {
+    background-color: skyblue; }

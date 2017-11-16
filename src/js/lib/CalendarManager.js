@@ -10,7 +10,7 @@ class CalendarManager {
     init() {
         const calendar = new Calendar({
             $calendar: $(".calendar[data-type='year']"),
-            // monthRange: 1, // 年カレンダーの表示数（奇数のみ）
+            // monthRange: 5, // 年カレンダーの表示数（奇数のみ）
             // dayRange: 5, // 日カレンダーの表示数（5 or 7）
             // virtual:{
             //     year: 2020,
@@ -27,7 +27,7 @@ class CalendarManager {
     
         // 年カレンダーの中の月をクリック
         $(`.calendar[data-type="year"] table`).on("click", evt => {
-            const monthIndex = evt.currentTarget.getAttribute("data-month-index");
+            const monthIndex = evt.currentTarget.getAttribute("data-month-index") | 0;
             calendar.createMonthCalendar($(`.calendar[data-type="month"]`), monthIndex);
         })
     
@@ -45,4 +45,5 @@ module.exports = new CalendarManager();
 
 /*
 http://www.frontendmemo.xyz/entry/2017/02/04/044306
+http://phiary.me/js-get-month-days/
 */

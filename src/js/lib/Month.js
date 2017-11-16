@@ -9,13 +9,13 @@ export default class Month {
     }
 
     createMonth(month) {
-        const date = new Date(ds.date.year, month - 1, 1);
+        const date = new Date(ds.year, month - 1, 1);
 
         // その月の1日が何曜日なのか / 日 ~ 土 0 ~ 6
         const firstDayOfWeekIndex = date.getDay() + this.info.firstDayOfWeekOffset;
 
         // その月の日数
-        const dayNum = this.getMonthDays(ds.date.year, month);
+        const dayNum = this.getMonthDays(ds.year, month);
 
         // その月の行数
         const rowNum = this.getMonthRows(firstDayOfWeekIndex, dayNum);
@@ -42,6 +42,9 @@ export default class Month {
                 let $td = day 
                     ? $(`<td data-day-index="${day}">${day}</td>`)
                     : $(`<td></td>`);
+                if(month === ds.month && day === ds.today){
+                    $td.addClass("is-today");
+                }
                 $tr.append($td);
             }
             $table.append($tr);
