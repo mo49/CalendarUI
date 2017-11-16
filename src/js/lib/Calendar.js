@@ -16,6 +16,9 @@ export default class Calendar {
     static MAX_MONTH = 12;
 
     constructor(opts={}) {
+        DateSingleton.date = opts.virtual;
+        this.dd = DateSingleton.date;
+        
         this.info = {
             columnNum: isNaN(opts.columnNum) ? 7 : opts.columnNum,
             monthRange: isNaN(opts.monthRange) ? null : opts.monthRange,
@@ -26,9 +29,6 @@ export default class Calendar {
                 week: opts.lang ? info.week[opts.lang.week] || info.week.en : info.week.en,
             },
         }
-
-        DateSingleton.date = opts.virtual;
-        this.dd = DateSingleton.date;
 
         if(this.info.firstDayOfWeekOffset) {
             for (let i = 0; i < this.info.firstDayOfWeekOffset; i++) {

@@ -1,4 +1,4 @@
-module.exports = {
+const info = {
     month:{
         ja: [
             '1月',
@@ -50,3 +50,7 @@ module.exports = {
         ],
     }
 }
+
+Object.freeze(info);
+
+module.exports = info;
