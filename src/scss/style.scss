@@ -1,0 +1,16 @@
+// reset css
+@import 'node_modules/reset.css/reset.css';
+
+// config
+@import 'variable', 'function', 'mixin', 'keyframes';
+
+// modules
+@import 'module/*';
+
+table{
+    display: inline-block;
+    vertical-align: top;
+    border: 1px solid #000;
+    margin: 10px;
+    text-align: center;
+}
