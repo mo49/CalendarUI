@@ -3,7 +3,7 @@ import Calendar from './lib/Calendar';
 
 (() => {
     new Calendar({
-        // lang: 'en'
+        $calendar: $(".calendar[data-type='year']"),
         // monthRange: 1, // 奇数のみ
         // dayRange: 5, // 5 or 7
         // type: 'month',
@@ -16,5 +16,13 @@ import Calendar from './lib/Calendar';
         //     month: 'en',
         //     // week: 'ja',
         // },
+    });
+    new Calendar({
+        $calendar: $(".calendar[data-type='month']"),
+        type: 'month',
+    });
+    new Calendar({
+        $calendar: $(".calendar[data-type='day']"),
+        type: 'day',
     });
 })()

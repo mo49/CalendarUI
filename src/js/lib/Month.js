@@ -1,38 +1,30 @@
 import $ from 'jquery';
 import _ from 'lodash';
-import label from '../config/label';
-import LabelSingleton from '../data/LabelSingleton';
-
+import info from '../data/Info';
+import ds from '../data/DateSingleton';
 
 export default class Month {
     constructor(opts={}) {
-        this.date = opts.date;
-        this.year = this.date.getFullYear();
-        this.month = this.date.getMonth() + 1;
-        this.today = this.date.getDate();
 
-        this.columnNum = opts.columnNum;
-
-        // LabelSingleton.month;
     }
 
     createMonth(month) {
-        const date = new Date(this.year, month - 1, 1);
+        const date = new Date(ds.date.year, month - 1, 1);
 
         // その月の1日が何曜日なのか / 日 ~ 土 0 ~ 6
-        const firstDayWeekIndex = date.getDay();
+        const firstDayOfWeekIndex = date.getDay();
 
         // その月の日数
-        const dayNum = this.getMonthDays(this.year, month);
+        const dayNum = this.getMonthDays(ds.date.year, month);
 
         // その月の行数
-        const rowNum = this.getMonthRows(firstDayWeekIndex, dayNum);
+        const rowNum = this.getMonthRows(firstDayOfWeekIndex, dayNum);
 
         // その月のすべてのセル（空も含める）
-        let cells = new Array(rowNum * this.columnNum);
+        let cells = new Array(rowNum * info.columnNum);
         // 日付を入れる
         for(let i = 0; i < dayNum; i++) {
-            cells[i+firstDayWeekIndex] = i+1;
+            cells[i+firstDayOfWeekIndex] = i+1;
         }
 
         return this.createTable(month, rowNum, cells);
@@ -40,13 +32,13 @@ export default class Month {
 
     createTable(month, rowNum, cells) {
         let $table = $(`<table data-month-index="${month}"><tbody></tbody></table>`);
-        this.insertTitle($table, month);
-        this.insertWeekLabel();
+        this.insertMonthLabel($table, month);
+        this.insertWeekLabel($table);
 
         for(let i = 0; i < rowNum; i++) {
             let $tr = $(`<tr data-row-index="${i+1}"></tr>`);
-            for(let j = 0; j < this.columnNum; j++) {
-                let day = cells[j+(i*this.columnNum)];
+            for(let j = 0; j < info.columnNum; j++) {
+                let day = cells[j+(i*info.columnNum)];
                 let $td = day 
                     ? $(`<td data-day-index="${day}">${day}</td>`)
                     : $(`<td></td>`);
@@ -57,25 +49,32 @@ export default class Month {
         return $table;
     }
 
-    insertTitle($table, month) {
+    insertMonthLabel($table, month) {
         $table.append(
             $(`<tr data-month-index="${month}">
-                <td colspan="${this.columnNum}">${label.month.ja[month-1]}</td>
+                <td colspan="${info.columnNum}">${info.label.month[month-1]}</td>
             </tr>`)
         );
     }
 
-    insertWeekLabel() {
-
+    insertWeekLabel($table) {
+        let $tr = $(`<tr></tr>`);
+        _.each(info.label.week, (elm,index) => {
+            let key = Object.keys(elm)[0];
+            $tr.append(
+                $(`<td data-weekday-type="${key}">${elm[key]}</td>`)
+            )
+        })
+        $table.append($tr);
     }
 
     getMonthDays(year, month) {
         return new Date(year, month, 0).getDate();
     }
 
-    getMonthRows(firstDayWeekIndex, dayNum) {
+    getMonthRows(firstDayOfWeekIndex, dayNum) {
         // row = ceil ( その月の1日のオフセット ＋ その月の日数 / 列数 )
-        return Math.ceil((firstDayWeekIndex + dayNum) / this.columnNum);
+        return Math.ceil((firstDayOfWeekIndex + dayNum) / info.columnNum);
     }
 
 }

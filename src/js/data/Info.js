@@ -1,4 +1,5 @@
-const LABELS = {
+module.exports = {
+    // 順番変わることはない
     month:{
         ja: [
             '1月',
@@ -29,6 +30,7 @@ const LABELS = {
             'December'
         ],
     },
+    // 順番変わることはありうる
     week:{
         ja: [
             { 0: '日' },
@@ -49,34 +51,12 @@ const LABELS = {
             { 6: 'Sat' }
         ],
     },
+    label:{
+        month:{},
+        week:{}
+    },
+    columnNum: 7,
+    monthRange: null,
+    dayRange: null,
+    firstDayOfWeekOffset: 0,
 }
-
-class LabelSingleton {
-    constructor() {
-        this._month = LABELS.month.ja;
-        this._week = LABELS.week.ja;
-        console.log("generate LabelSingleton instance.");
-    }
-
-    set month(_lang) {
-        this._month = LABELS.month[_lang];
-        console.log("set month : ", this.month);
-    }
-
-    get month() {
-        console.log("get month : ", this._month);
-        return this._month;
-    }
-
-    set week(_lang) {
-        this._week = LABELS.week[_lang];
-        console.log("set week : ", this.week);
-    }
-
-    get week() {
-        console.log("get week : ", this._week);
-        return this._week;
-    }
-}
-
-export default new LabelSingleton();

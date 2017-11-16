@@ -7,6 +7,9 @@
 // modules
 @import 'module/*';
 
+.calendar{
+    
+}
 table{
     display: inline-block;
     vertical-align: top;
@@ -14,3 +17,22 @@ table{
     margin: 10px;
     text-align: center;
 }
+td{
+    padding: 5px;
+    @for $i from 0 through 6 {
+        &[data-weekday-type="#{$i}"]{
+
+        }
+    }
+    // 日
+    &[data-weekday-type="0"]{
+        color: red;
+    }
+    // 土
+    &[data-weekday-type="6"]{
+        color: blue;
+    }
+
+}
+
+

@@ -1,6 +1,8 @@
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 module.exports = { "default": require("core-js/library/fn/object/define-property"), __esModule: true };
-},{"core-js/library/fn/object/define-property":4}],2:[function(require,module,exports){
+},{"core-js/library/fn/object/define-property":5}],2:[function(require,module,exports){
+module.exports = { "default": require("core-js/library/fn/object/keys"), __esModule: true };
+},{"core-js/library/fn/object/keys":6}],3:[function(require,module,exports){
 "use strict";
 
 exports.__esModule = true;
@@ -10,7 +12,7 @@ exports.default = function (instance, Constructor) {
     throw new TypeError("Cannot call a class as a function");
   }
 };
-},{}],3:[function(require,module,exports){
+},{}],4:[function(require,module,exports){
 "use strict";
 
 exports.__esModule = true;
@@ -38,27 +40,58 @@ exports.default = function () {
     return Constructor;
   };
 }();
-},{"../core-js/object/define-property":1}],4:[function(require,module,exports){
+},{"../core-js/object/define-property":1}],5:[function(require,module,exports){
 require('../../modules/es6.object.define-property');
 var $Object = require('../../modules/_core').Object;
 module.exports = function defineProperty(it, key, desc){
   return $Object.defineProperty(it, key, desc);
 };
-},{"../../modules/_core":7,"../../modules/es6.object.define-property":20}],5:[function(require,module,exports){
+},{"../../modules/_core":11,"../../modules/es6.object.define-property":39}],6:[function(require,module,exports){
+require('../../modules/es6.object.keys');
+module.exports = require('../../modules/_core').Object.keys;
+},{"../../modules/_core":11,"../../modules/es6.object.keys":40}],7:[function(require,module,exports){
 module.exports = function(it){
   if(typeof it != 'function')throw TypeError(it + ' is not a function!');
   return it;
 };
-},{}],6:[function(require,module,exports){
+},{}],8:[function(require,module,exports){
 var isObject = require('./_is-object');
 module.exports = function(it){
   if(!isObject(it))throw TypeError(it + ' is not an object!');
   return it;
 };
-},{"./_is-object":16}],7:[function(require,module,exports){
+},{"./_is-object":24}],9:[function(require,module,exports){
+// false -> Array#indexOf
+// true  -> Array#includes
+var toIObject = require('./_to-iobject')
+  , toLength  = require('./_to-length')
+  , toIndex   = require('./_to-index');
+module.exports = function(IS_INCLUDES){
+  return function($this, el, fromIndex){
+    var O      = toIObject($this)
+      , length = toLength(O.length)
+      , index  = toIndex(fromIndex, length)
+      , value;
+    // Array#includes uses SameValueZero equality algorithm
+    if(IS_INCLUDES && el != el)while(length > index){
+      value = O[index++];
+      if(value != value)return true;
+    // Array#toIndex ignores holes, Array#includes - not
+    } else for(;length > index; index++)if(IS_INCLUDES || index in O){
+      if(O[index] === el)return IS_INCLUDES || index || 0;
+    } return !IS_INCLUDES && -1;
+  };
+};
+},{"./_to-index":32,"./_to-iobject":34,"./_to-length":35}],10:[function(require,module,exports){
+var toString = {}.toString;
+
+module.exports = function(it){
+  return toString.call(it).slice(8, -1);
+};
+},{}],11:[function(require,module,exports){
 var core = module.exports = {version: '2.4.0'};
 if(typeof __e == 'number')__e = core; // eslint-disable-line no-undef
-},{}],8:[function(require,module,exports){
+},{}],12:[function(require,module,exports){
 // optional / simple context binding
 var aFunction = require('./_a-function');
 module.exports = function(fn, that, length){
@@ -79,12 +112,18 @@ module.exports = function(fn, that, length){
     return fn.apply(that, arguments);
   };
 };
-},{"./_a-function":5}],9:[function(require,module,exports){
+},{"./_a-function":7}],13:[function(require,module,exports){
+// 7.2.1 RequireObjectCoercible(argument)
+module.exports = function(it){
+  if(it == undefined)throw TypeError("Can't call method on  " + it);
+  return it;
+};
+},{}],14:[function(require,module,exports){
 // Thank's IE8 for his funny defineProperty
 module.exports = !require('./_fails')(function(){
   return Object.defineProperty({}, 'a', {get: function(){ return 7; }}).a != 7;
 });
-},{"./_fails":12}],10:[function(require,module,exports){
+},{"./_fails":18}],15:[function(require,module,exports){
 var isObject = require('./_is-object')
   , document = require('./_global').document
   // in old IE typeof document.createElement is 'object'
@@ -92,7 +131,12 @@ var isObject = require('./_is-object')
 module.exports = function(it){
   return is ? document.createElement(it) : {};
 };
-},{"./_global":13,"./_is-object":16}],11:[function(require,module,exports){
+},{"./_global":19,"./_is-object":24}],16:[function(require,module,exports){
+// IE 8- don't enum bug keys
+module.exports = (
+  'constructor,hasOwnProperty,isPrototypeOf,propertyIsEnumerable,toLocaleString,toString,valueOf'
+).split(',');
+},{}],17:[function(require,module,exports){
 var global    = require('./_global')
   , core      = require('./_core')
   , ctx       = require('./_ctx')
@@ -154,7 +198,7 @@ $export.W = 32;  // wrap
 $export.U = 64;  // safe
 $export.R = 128; // real proto method for `library` 
 module.exports = $export;
-},{"./_core":7,"./_ctx":8,"./_global":13,"./_hide":14}],12:[function(require,module,exports){
+},{"./_core":11,"./_ctx":12,"./_global":19,"./_hide":21}],18:[function(require,module,exports){
 module.exports = function(exec){
   try {
     return !!exec();
@@ -162,12 +206,17 @@ module.exports = function(exec){
     return true;
   }
 };
-},{}],13:[function(require,module,exports){
+},{}],19:[function(require,module,exports){
 // https://github.com/zloirock/core-js/issues/86#issuecomment-115759028
 var global = module.exports = typeof window != 'undefined' && window.Math == Math
   ? window : typeof self != 'undefined' && self.Math == Math ? self : Function('return this')();
 if(typeof __g == 'number')__g = global; // eslint-disable-line no-undef
-},{}],14:[function(require,module,exports){
+},{}],20:[function(require,module,exports){
+var hasOwnProperty = {}.hasOwnProperty;
+module.exports = function(it, key){
+  return hasOwnProperty.call(it, key);
+};
+},{}],21:[function(require,module,exports){
 var dP         = require('./_object-dp')
   , createDesc = require('./_property-desc');
 module.exports = require('./_descriptors') ? function(object, key, value){
@@ -176,15 +225,21 @@ module.exports = require('./_descriptors') ? function(object, key, value){
   object[key] = value;
   return object;
 };
-},{"./_descriptors":9,"./_object-dp":17,"./_property-desc":18}],15:[function(require,module,exports){
+},{"./_descriptors":14,"./_object-dp":25,"./_property-desc":29}],22:[function(require,module,exports){
 module.exports = !require('./_descriptors') && !require('./_fails')(function(){
   return Object.defineProperty(require('./_dom-create')('div'), 'a', {get: function(){ return 7; }}).a != 7;
 });
-},{"./_descriptors":9,"./_dom-create":10,"./_fails":12}],16:[function(require,module,exports){
+},{"./_descriptors":14,"./_dom-create":15,"./_fails":18}],23:[function(require,module,exports){
+// fallback for non-array-like ES3 and non-enumerable old V8 strings
+var cof = require('./_cof');
+module.exports = Object('z').propertyIsEnumerable(0) ? Object : function(it){
+  return cof(it) == 'String' ? it.split('') : Object(it);
+};
+},{"./_cof":10}],24:[function(require,module,exports){
 module.exports = function(it){
   return typeof it === 'object' ? it !== null : typeof it === 'function';
 };
-},{}],17:[function(require,module,exports){
+},{}],25:[function(require,module,exports){
 var anObject       = require('./_an-object')
   , IE8_DOM_DEFINE = require('./_ie8-dom-define')
   , toPrimitive    = require('./_to-primitive')
@@ -201,7 +256,44 @@ exports.f = require('./_descriptors') ? Object.defineProperty : function defineP
   if('value' in Attributes)O[P] = Attributes.value;
   return O;
 };
-},{"./_an-object":6,"./_descriptors":9,"./_ie8-dom-define":15,"./_to-primitive":19}],18:[function(require,module,exports){
+},{"./_an-object":8,"./_descriptors":14,"./_ie8-dom-define":22,"./_to-primitive":37}],26:[function(require,module,exports){
+var has          = require('./_has')
+  , toIObject    = require('./_to-iobject')
+  , arrayIndexOf = require('./_array-includes')(false)
+  , IE_PROTO     = require('./_shared-key')('IE_PROTO');
+
+module.exports = function(object, names){
+  var O      = toIObject(object)
+    , i      = 0
+    , result = []
+    , key;
+  for(key in O)if(key != IE_PROTO)has(O, key) && result.push(key);
+  // Don't enum bug & hidden keys
+  while(names.length > i)if(has(O, key = names[i++])){
+    ~arrayIndexOf(result, key) || result.push(key);
+  }
+  return result;
+};
+},{"./_array-includes":9,"./_has":20,"./_shared-key":30,"./_to-iobject":34}],27:[function(require,module,exports){
+// 19.1.2.14 / 15.2.3.14 Object.keys(O)
+var $keys       = require('./_object-keys-internal')
+  , enumBugKeys = require('./_enum-bug-keys');
+
+module.exports = Object.keys || function keys(O){
+  return $keys(O, enumBugKeys);
+};
+},{"./_enum-bug-keys":16,"./_object-keys-internal":26}],28:[function(require,module,exports){
+// most Object methods by ES6 should accept primitives
+var $export = require('./_export')
+  , core    = require('./_core')
+  , fails   = require('./_fails');
+module.exports = function(KEY, exec){
+  var fn  = (core.Object || {})[KEY] || Object[KEY]
+    , exp = {};
+  exp[KEY] = exec(fn);
+  $export($export.S + $export.F * fails(function(){ fn(1); }), 'Object', exp);
+};
+},{"./_core":11,"./_export":17,"./_fails":18}],29:[function(require,module,exports){
 module.exports = function(bitmap, value){
   return {
     enumerable  : !(bitmap & 1),
@@ -210,7 +302,55 @@ module.exports = function(bitmap, value){
     value       : value
   };
 };
-},{}],19:[function(require,module,exports){
+},{}],30:[function(require,module,exports){
+var shared = require('./_shared')('keys')
+  , uid    = require('./_uid');
+module.exports = function(key){
+  return shared[key] || (shared[key] = uid(key));
+};
+},{"./_shared":31,"./_uid":38}],31:[function(require,module,exports){
+var global = require('./_global')
+  , SHARED = '__core-js_shared__'
+  , store  = global[SHARED] || (global[SHARED] = {});
+module.exports = function(key){
+  return store[key] || (store[key] = {});
+};
+},{"./_global":19}],32:[function(require,module,exports){
+var toInteger = require('./_to-integer')
+  , max       = Math.max
+  , min       = Math.min;
+module.exports = function(index, length){
+  index = toInteger(index);
+  return index < 0 ? max(index + length, 0) : min(index, length);
+};
+},{"./_to-integer":33}],33:[function(require,module,exports){
+// 7.1.4 ToInteger
+var ceil  = Math.ceil
+  , floor = Math.floor;
+module.exports = function(it){
+  return isNaN(it = +it) ? 0 : (it > 0 ? floor : ceil)(it);
+};
+},{}],34:[function(require,module,exports){
+// to indexed object, toObject with fallback for non-array-like ES3 strings
+var IObject = require('./_iobject')
+  , defined = require('./_defined');
+module.exports = function(it){
+  return IObject(defined(it));
+};
+},{"./_defined":13,"./_iobject":23}],35:[function(require,module,exports){
+// 7.1.15 ToLength
+var toInteger = require('./_to-integer')
+  , min       = Math.min;
+module.exports = function(it){
+  return it > 0 ? min(toInteger(it), 0x1fffffffffffff) : 0; // pow(2, 53) - 1 == 9007199254740991
+};
+},{"./_to-integer":33}],36:[function(require,module,exports){
+// 7.1.13 ToObject(argument)
+var defined = require('./_defined');
+module.exports = function(it){
+  return Object(defined(it));
+};
+},{"./_defined":13}],37:[function(require,module,exports){
 // 7.1.1 ToPrimitive(input [, PreferredType])
 var isObject = require('./_is-object');
 // instead of the ES6 spec version, we didn't implement @@toPrimitive case
@@ -223,11 +363,27 @@ module.exports = function(it, S){
   if(!S && typeof (fn = it.toString) == 'function' && !isObject(val = fn.call(it)))return val;
   throw TypeError("Can't convert object to primitive value");
 };
-},{"./_is-object":16}],20:[function(require,module,exports){
+},{"./_is-object":24}],38:[function(require,module,exports){
+var id = 0
+  , px = Math.random();
+module.exports = function(key){
+  return 'Symbol('.concat(key === undefined ? '' : key, ')_', (++id + px).toString(36));
+};
+},{}],39:[function(require,module,exports){
 var $export = require('./_export');
 // 19.1.2.4 / 15.2.3.6 Object.defineProperty(O, P, Attributes)
 $export($export.S + $export.F * !require('./_descriptors'), 'Object', {defineProperty: require('./_object-dp').f});
-},{"./_descriptors":9,"./_export":11,"./_object-dp":17}],21:[function(require,module,exports){
+},{"./_descriptors":14,"./_export":17,"./_object-dp":25}],40:[function(require,module,exports){
+// 19.1.2.14 Object.keys(O)
+var toObject = require('./_to-object')
+  , $keys    = require('./_object-keys');
+
+require('./_object-sap')('keys', function(){
+  return function keys(it){
+    return $keys(toObject(it));
+  };
+});
+},{"./_object-keys":27,"./_object-sap":28,"./_to-object":36}],41:[function(require,module,exports){
 /*!
  * jQuery JavaScript Library v2.2.4
  * http://jquery.com/
@@ -10043,7 +10199,7 @@ if ( !noGlobal ) {
 return jQuery;
 }));
 
-},{}],22:[function(require,module,exports){
+},{}],42:[function(require,module,exports){
 (function (global){
 /**
  * @license
@@ -22398,84 +22554,99 @@ return jQuery;
 }.call(this));
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],23:[function(require,module,exports){
-'use strict';
-
-module.exports = {
-    month: {
-        ja: ['1月', '2月', '3月', '4月', '5月', '6月', '7月', '8月', '9月', '10月', '11月', '12月'],
-        en: ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
-    },
-    week: {
-        ja: ['日', '月', '火', '水', '木', '金', '土'],
-        en: ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
-    }
-};
-
-},{}],24:[function(require,module,exports){
-'use strict';
+},{}],43:[function(require,module,exports){
+"use strict";
 
 Object.defineProperty(exports, "__esModule", {
     value: true
 });
 
-var _classCallCheck2 = require('babel-runtime/helpers/classCallCheck');
+var _classCallCheck2 = require("babel-runtime/helpers/classCallCheck");
 
 var _classCallCheck3 = _interopRequireDefault(_classCallCheck2);
 
-var _createClass2 = require('babel-runtime/helpers/createClass');
+var _createClass2 = require("babel-runtime/helpers/createClass");
 
 var _createClass3 = _interopRequireDefault(_createClass2);
 
+var _lodash = require("lodash");
+
+var _lodash2 = _interopRequireDefault(_lodash);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-var LABELS = {
+var DateSingleton = function () {
+    function DateSingleton() {
+        (0, _classCallCheck3.default)(this, DateSingleton);
+
+        console.log("generate DateSingleton instance.");
+        this._date = null;
+        this._base = null;
+        this._year = null;
+        this._month = null;
+        this._today = null;
+    }
+
+    (0, _createClass3.default)(DateSingleton, [{
+        key: "date",
+        set: function set(_virtual) {
+            if (
+            // YYYY/MM/DD がすべてあれば仮想の日時を設定
+            _virtual && /^[0-9]{4}$/.test(_virtual.year) && _lodash2.default.inRange(_virtual.month, 1, DateSingleton.MAX_MONTH + 1) && _lodash2.default.inRange(_virtual.today, 1, DateSingleton.MAX_DAY + 1)) {
+                this._year = _virtual.year;
+                this._month = _virtual.month;
+                this._today = _virtual.today;
+                this._base = new Date(this._year, this._month - 1, this._today);
+            } else {
+                this._base = new Date();
+                this._year = this._base.getFullYear();
+                this._month = this._base.getMonth() + 1;
+                this._today = this._base.getDate();
+            }
+
+            this._date = {
+                date: this._base,
+                year: this._year,
+                month: this._month,
+                today: this._today
+            };
+        },
+        get: function get() {
+            return this._date;
+        }
+    }]);
+    return DateSingleton;
+}();
+
+DateSingleton.MAX_MONTH = 12;
+DateSingleton.MAX_DAY = 31;
+exports.default = new DateSingleton();
+
+},{"babel-runtime/helpers/classCallCheck":3,"babel-runtime/helpers/createClass":4,"lodash":42}],44:[function(require,module,exports){
+'use strict';
+
+module.exports = {
+    // 順番変わることはない
     month: {
         ja: ['1月', '2月', '3月', '4月', '5月', '6月', '7月', '8月', '9月', '10月', '11月', '12月'],
         en: ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
     },
+    // 順番変わることはありうる
     week: {
-        ja: ['日', '月', '火', '水', '木', '金', '土'],
-        en: ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
-    }
+        ja: [{ 0: '日' }, { 1: '月' }, { 2: '火' }, { 3: '水' }, { 4: '木' }, { 5: '金' }, { 6: '土' }],
+        en: [{ 0: 'Sun' }, { 1: 'Mon' }, { 2: 'Tue' }, { 3: 'Wed' }, { 4: 'Thu' }, { 5: 'Fri' }, { 6: 'Sat' }]
+    },
+    label: {
+        month: {},
+        week: {}
+    },
+    columnNum: 7,
+    monthRange: null,
+    dayRange: null,
+    firstDayOfWeekOffset: 0
 };
 
-var LabelSingleton = function () {
-    function LabelSingleton() {
-        (0, _classCallCheck3.default)(this, LabelSingleton);
-
-        this._month = LABELS.month.ja;
-        this._week = LABELS.week.ja;
-        console.log("generate LabelSingleton instance.");
-    }
-
-    (0, _createClass3.default)(LabelSingleton, [{
-        key: 'month',
-        set: function set(_lang) {
-            this._month = LABELS.month[_lang];
-            console.log("set month : ", this.month);
-        },
-        get: function get() {
-            console.log("get month : ", this._month);
-            return this._month;
-        }
-    }, {
-        key: 'week',
-        set: function set(_lang) {
-            this._week = LABELS.week[_lang];
-            console.log("set week : ", this.week);
-        },
-        get: function get() {
-            console.log("get week : ", this._week);
-            return this._week;
-        }
-    }]);
-    return LabelSingleton;
-}();
-
-exports.default = new LabelSingleton();
-
-},{"babel-runtime/helpers/classCallCheck":2,"babel-runtime/helpers/createClass":3}],25:[function(require,module,exports){
+},{}],45:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -22498,17 +22669,17 @@ var _lodash = require('lodash');
 
 var _lodash2 = _interopRequireDefault(_lodash);
 
-var _label = require('../config/label');
+var _Info = require('../data/Info');
 
-var _label2 = _interopRequireDefault(_label);
+var _Info2 = _interopRequireDefault(_Info);
+
+var _DateSingleton = require('../data/DateSingleton');
+
+var _DateSingleton2 = _interopRequireDefault(_DateSingleton);
 
 var _Month = require('./Month');
 
 var _Month2 = _interopRequireDefault(_Month);
-
-var _LabelSingleton = require('../data/LabelSingleton');
-
-var _LabelSingleton2 = _interopRequireDefault(_LabelSingleton);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -22519,50 +22690,28 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 ・好きな曜日始まりにできる
 */
 
-/*
-TODO: 
-DateとLabelをSingletonにして複数クラスから参照できるようにする
-値のセットはCalendarクラスのコンストラクタの中で行う
-*/
-
 var Calendar = function () {
     function Calendar() {
         var opts = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
         (0, _classCallCheck3.default)(this, Calendar);
 
-        this.$calendar = opts.$calendar || (0, _jquery2.default)('#calendar') || (0, _jquery2.default)(document.createElement('div'));
+        this.$calendar = opts.$calendar || (0, _jquery2.default)('.calendar') || (0, _jquery2.default)(document.createElement('div'));
         this.type = opts.type || 'year'; // year, month, day
 
-        this.setDate(opts.virtual);
-
         this.columnNum = isNaN(opts.columnNum) ? 7 : opts.columnNum;
-        this.monthRange = isNaN(opts.monthRange) ? null : opts.monthRange;
-        this.dayRange = isNaN(opts.dayRange) ? null : opts.dayRange;
+        this.monthRange = isNaN(opts.monthRange) ? _Info2.default.monthRange : opts.monthRange;
+        this.dayRange = isNaN(opts.dayRange) ? _Info2.default.dayRange : opts.dayRange;
 
-        _LabelSingleton2.default.month = opts.lang ? opts.lang.month || 'ja' : 'ja';
-        _LabelSingleton2.default.week = opts.lang ? opts.lang.week || 'en' : 'en';
+        _Info2.default.label.month = opts.lang ? _Info2.default.month[opts.lang.month] : _Info2.default.month.ja;
+        _Info2.default.label.week = opts.lang ? _Info2.default.week[opts.lang.week] : _Info2.default.week.en;
+
+        _DateSingleton2.default.date = opts.virtual;
+        this.dd = _DateSingleton2.default.date;
 
         this.createCalendar();
     }
 
     (0, _createClass3.default)(Calendar, [{
-        key: 'setDate',
-        value: function setDate(virtual) {
-            if (
-            // YYYY/MM/DD がすべてあれば仮想の日時を設定
-            virtual && /^[0-9]{4}$/.test(virtual.year) && _lodash2.default.inRange(virtual.month, 1, Calendar.MAX_MONTH + 1) && _lodash2.default.inRange(virtual.today, 1, Calendar.MAX_DAY + 1)) {
-                this.year = virtual.year;
-                this.month = virtual.month;
-                this.today = virtual.today;
-                this.date = new Date(this.year, this.month - 1, this.today);
-            } else {
-                this.date = new Date();
-                this.year = this.date.getFullYear();
-                this.month = this.date.getMonth() + 1;
-                this.today = this.date.getDate();
-            }
-        }
-    }, {
         key: 'createCalendar',
         value: function createCalendar() {
             switch (this.type) {
@@ -22577,11 +22726,11 @@ var Calendar = function () {
     }, {
         key: 'createYearCalendar',
         value: function createYearCalendar() {
-            this.$calendar.append((0, _jquery2.default)('<p class=\'calendar__year\'>' + this.year + '</p>'));
+            this.insertYearLabel();
             for (var i = 1; i <= Calendar.MAX_MONTH; i++) {
                 if (this.monthRange) {
                     var offset = Math.floor(this.monthRange / 2);
-                    if (_lodash2.default.inRange(i, this.month - offset, this.month + offset + 1)) {
+                    if (_lodash2.default.inRange(i, this.dd.month - offset, this.dd.month + offset + 1)) {
                         this.insertMonth(i);
                     }
                     continue;
@@ -22592,8 +22741,8 @@ var Calendar = function () {
     }, {
         key: 'createMonthCalendar',
         value: function createMonthCalendar() {
-            // this.$calendar.append($(`<p class='calendar__year'>${this.year}</p>`));
-            this.insertMonth(this.month);
+            this.insertYearLabel();
+            this.insertMonth(this.dd.month);
         }
     }, {
         key: 'createDayCalendar',
@@ -22602,20 +22751,21 @@ var Calendar = function () {
             this.insertOneLiner();
         }
     }, {
+        key: 'insertYearLabel',
+        value: function insertYearLabel() {
+            this.$calendar.append((0, _jquery2.default)('<p class=\'calendar__year\'>' + this.dd.year + '</p>'));
+        }
+    }, {
         key: 'insertMonth',
         value: function insertMonth(index) {
-            var month = new _Month2.default({
-                date: this.date,
-                columnNum: this.columnNum
-            });
-            var monthTable = month.createMonth(index);
+            var monthTable = new _Month2.default().createMonth(index);
             this.$calendar.append(monthTable);
         }
     }, {
         key: 'insertOneLiner',
         value: function insertOneLiner() {
             // const oneLiner = new OneLiner({})
-            // const oneLinerTable = oneLiner.createOneLiner(this.dayRange);
+            // const oneLinerTable = oneLiner.createOneLiner(info.dayRange);
             // this.$calendar.append(oneLinerTable);
         }
     }]);
@@ -22628,15 +22778,18 @@ http://www.frontendmemo.xyz/entry/2017/02/04/044306
 
 
 Calendar.MAX_MONTH = 12;
-Calendar.MAX_DAY = 31;
 exports.default = Calendar;
 
-},{"../config/label":23,"../data/LabelSingleton":24,"./Month":26,"babel-runtime/helpers/classCallCheck":2,"babel-runtime/helpers/createClass":3,"jquery":21,"lodash":22}],26:[function(require,module,exports){
+},{"../data/DateSingleton":43,"../data/Info":44,"./Month":46,"babel-runtime/helpers/classCallCheck":3,"babel-runtime/helpers/createClass":4,"jquery":41,"lodash":42}],46:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
     value: true
 });
+
+var _keys = require('babel-runtime/core-js/object/keys');
+
+var _keys2 = _interopRequireDefault(_keys);
 
 var _classCallCheck2 = require('babel-runtime/helpers/classCallCheck');
 
@@ -22654,13 +22807,13 @@ var _lodash = require('lodash');
 
 var _lodash2 = _interopRequireDefault(_lodash);
 
-var _label = require('../config/label');
+var _Info = require('../data/Info');
 
-var _label2 = _interopRequireDefault(_label);
+var _Info2 = _interopRequireDefault(_Info);
 
-var _LabelSingleton = require('../data/LabelSingleton');
+var _DateSingleton = require('../data/DateSingleton');
 
-var _LabelSingleton2 = _interopRequireDefault(_LabelSingleton);
+var _DateSingleton2 = _interopRequireDefault(_DateSingleton);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -22668,36 +22821,27 @@ var Month = function () {
     function Month() {
         var opts = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
         (0, _classCallCheck3.default)(this, Month);
-
-        this.date = opts.date;
-        this.year = this.date.getFullYear();
-        this.month = this.date.getMonth() + 1;
-        this.today = this.date.getDate();
-
-        this.columnNum = opts.columnNum;
-
-        // LabelSingleton.month;
     }
 
     (0, _createClass3.default)(Month, [{
         key: 'createMonth',
         value: function createMonth(month) {
-            var date = new Date(this.year, month - 1, 1);
+            var date = new Date(_DateSingleton2.default.date.year, month - 1, 1);
 
             // その月の1日が何曜日なのか / 日 ~ 土 0 ~ 6
-            var firstDayWeekIndex = date.getDay();
+            var firstDayOfWeekIndex = date.getDay();
 
             // その月の日数
-            var dayNum = this.getMonthDays(this.year, month);
+            var dayNum = this.getMonthDays(_DateSingleton2.default.date.year, month);
 
             // その月の行数
-            var rowNum = this.getMonthRows(firstDayWeekIndex, dayNum);
+            var rowNum = this.getMonthRows(firstDayOfWeekIndex, dayNum);
 
             // その月のすべてのセル（空も含める）
-            var cells = new Array(rowNum * this.columnNum);
+            var cells = new Array(rowNum * _Info2.default.columnNum);
             // 日付を入れる
             for (var i = 0; i < dayNum; i++) {
-                cells[i + firstDayWeekIndex] = i + 1;
+                cells[i + firstDayOfWeekIndex] = i + 1;
             }
 
             return this.createTable(month, rowNum, cells);
@@ -22706,13 +22850,13 @@ var Month = function () {
         key: 'createTable',
         value: function createTable(month, rowNum, cells) {
             var $table = (0, _jquery2.default)('<table data-month-index="' + month + '"><tbody></tbody></table>');
-            this.insertTitle($table, month);
-            this.insertWeekLabel();
+            this.insertMonthLabel($table, month);
+            this.insertWeekLabel($table);
 
             for (var i = 0; i < rowNum; i++) {
                 var $tr = (0, _jquery2.default)('<tr data-row-index="' + (i + 1) + '"></tr>');
-                for (var j = 0; j < this.columnNum; j++) {
-                    var day = cells[j + i * this.columnNum];
+                for (var j = 0; j < _Info2.default.columnNum; j++) {
+                    var day = cells[j + i * _Info2.default.columnNum];
                     var $td = day ? (0, _jquery2.default)('<td data-day-index="' + day + '">' + day + '</td>') : (0, _jquery2.default)('<td></td>');
                     $tr.append($td);
                 }
@@ -22721,13 +22865,20 @@ var Month = function () {
             return $table;
         }
     }, {
-        key: 'insertTitle',
-        value: function insertTitle($table, month) {
-            $table.append((0, _jquery2.default)('<tr data-month-index="' + month + '">\n                <td colspan="' + this.columnNum + '">' + _label2.default.month.ja[month - 1] + '</td>\n            </tr>'));
+        key: 'insertMonthLabel',
+        value: function insertMonthLabel($table, month) {
+            $table.append((0, _jquery2.default)('<tr data-month-index="' + month + '">\n                <td colspan="' + _Info2.default.columnNum + '">' + _Info2.default.label.month[month - 1] + '</td>\n            </tr>'));
         }
     }, {
         key: 'insertWeekLabel',
-        value: function insertWeekLabel() {}
+        value: function insertWeekLabel($table) {
+            var $tr = (0, _jquery2.default)('<tr></tr>');
+            _lodash2.default.each(_Info2.default.label.week, function (elm, index) {
+                var key = (0, _keys2.default)(elm)[0];
+                $tr.append((0, _jquery2.default)('<td data-weekday-type="' + key + '">' + elm[key] + '</td>'));
+            });
+            $table.append($tr);
+        }
     }, {
         key: 'getMonthDays',
         value: function getMonthDays(year, month) {
@@ -22735,9 +22886,9 @@ var Month = function () {
         }
     }, {
         key: 'getMonthRows',
-        value: function getMonthRows(firstDayWeekIndex, dayNum) {
+        value: function getMonthRows(firstDayOfWeekIndex, dayNum) {
             // row = ceil ( その月の1日のオフセット ＋ その月の日数 / 列数 )
-            return Math.ceil((firstDayWeekIndex + dayNum) / this.columnNum);
+            return Math.ceil((firstDayOfWeekIndex + dayNum) / _Info2.default.columnNum);
         }
     }]);
     return Month;
@@ -22745,7 +22896,7 @@ var Month = function () {
 
 exports.default = Month;
 
-},{"../config/label":23,"../data/LabelSingleton":24,"babel-runtime/helpers/classCallCheck":2,"babel-runtime/helpers/createClass":3,"jquery":21,"lodash":22}],27:[function(require,module,exports){
+},{"../data/DateSingleton":43,"../data/Info":44,"babel-runtime/core-js/object/keys":2,"babel-runtime/helpers/classCallCheck":3,"babel-runtime/helpers/createClass":4,"jquery":41,"lodash":42}],47:[function(require,module,exports){
 'use strict';
 
 var _jquery = require('jquery');
@@ -22760,7 +22911,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 
 (function () {
     new _Calendar2.default({
-        // lang: 'en'
+        $calendar: (0, _jquery2.default)(".calendar[data-type='year']")
         // monthRange: 1, // 奇数のみ
         // dayRange: 5, // 5 or 7
         // type: 'month',
@@ -22774,6 +22925,14 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
         //     // week: 'ja',
         // },
     });
+    new _Calendar2.default({
+        $calendar: (0, _jquery2.default)(".calendar[data-type='month']"),
+        type: 'month'
+    });
+    new _Calendar2.default({
+        $calendar: (0, _jquery2.default)(".calendar[data-type='day']"),
+        type: 'day'
+    });
 })();
 
-},{"./lib/Calendar":25,"jquery":21}]},{},[27]);
+},{"./lib/Calendar":45,"jquery":41}]},{},[47]);

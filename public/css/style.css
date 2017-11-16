@@ -57,3 +57,10 @@ table {
   border: 1px solid #000;
   margin: 10px;
   text-align: center; }
+
+td {
+  padding: 5px; }
+  td[data-weekday-type="0"] {
+    color: red; }
+  td[data-weekday-type="6"] {
+    color: blue; }
