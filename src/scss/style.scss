@@ -79,6 +79,9 @@ td{
     .is-thisMonth{
         color: orange;
     }
+    .js-zoom-month{
+        cursor: pointer;
+    }
 }
 .calendar[data-type="month"]{
     td{
@@ -94,6 +97,9 @@ td{
         &[data-dayofweek-type="6"]{
             color: blue;
         }
+    }
+    .js-zoom-day{
+        cursor: pointer;
     }
 }
 .calendar[data-type="day"]{

@@ -96,6 +96,9 @@ td {
 .calendar[data-type="year"] .is-thisMonth {
   color: orange; }
 
+.calendar[data-type="year"] .js-zoom-month {
+  cursor: pointer; }
+
 .calendar[data-type="month"] td[data-day-index] {
   color: #666; }
 
@@ -104,6 +107,9 @@ td {
 
 .calendar[data-type="month"] td[data-dayofweek-type="6"] {
   color: blue; }
+
+.calendar[data-type="month"] .js-zoom-day {
+  cursor: pointer; }
 
 .calendar[data-type="day"] .is-center {
   background-color: skyblue; }
