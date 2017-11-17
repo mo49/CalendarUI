@@ -23006,10 +23006,11 @@ var Month = function () {
             this.insertWeekLabel($table);
 
             for (var i = 0; i < rowNum; i++) {
-                var $tr = (0, _jquery2.default)('<tr data-row-index="' + (i + 1) + '"></tr>');
+                var $tr = (0, _jquery2.default)('<tr data-week-index="' + (i + 1) + '"></tr>');
                 for (var j = 0; j < this.info.columnNum; j++) {
-                    var day = cells[j + i * this.info.columnNum];
-                    var $td = day ? (0, _jquery2.default)('<td data-day-index="' + day + '">' + day + '</td>') : (0, _jquery2.default)('<td></td>');
+                    var cellIndex = j + i * this.info.columnNum;
+                    var day = cells[cellIndex];
+                    var $td = day ? (0, _jquery2.default)('<td data-day-index="' + day + '" \n                        data-dayofweek-type="' + cellIndex % this.info.columnNum + '">\n                        ' + day + '</td>') : (0, _jquery2.default)('<td></td>');
                     if (month === _DateSingleton2.default.month && day === _DateSingleton2.default.today) {
                         $td.addClass("is-today");
                     }
@@ -23022,15 +23023,15 @@ var Month = function () {
     }, {
         key: 'insertMonthLabel',
         value: function insertMonthLabel($table, month) {
-            $table.append((0, _jquery2.default)('<tr data-month-index="' + month + '">\n                <td colspan="' + this.info.columnNum + '">' + this.info.label.month[month - 1] + '</td>\n            </tr>'));
+            $table.append((0, _jquery2.default)('<tr class="calendar__month" data-month-index="' + month + '">\n                <td colspan="' + this.info.columnNum + '">' + this.info.label.month[month - 1] + '</td>\n            </tr>'));
         }
     }, {
         key: 'insertWeekLabel',
         value: function insertWeekLabel($table) {
-            var $tr = (0, _jquery2.default)('<tr></tr>');
+            var $tr = (0, _jquery2.default)('<tr class="calendar__week"></tr>');
             _lodash2.default.each(this.info.label.week, function (elm, index) {
                 var key = (0, _keys2.default)(elm)[0];
-                $tr.append((0, _jquery2.default)('<td data-weekday-type="' + key + '">' + elm[key] + '</td>'));
+                $tr.append((0, _jquery2.default)('<td data-dayofweek-type="' + key + '">' + elm[key] + '</td>'));
             });
             $table.append($tr);
         }

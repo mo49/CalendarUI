@@ -24,10 +24,9 @@
     }
     &[data-type="month"]{
         table{
-            font-size: 24px;
+            font-size: 26px;
         }
         td{
-            // width: 50px;
         }
     }
 }
@@ -37,6 +36,7 @@ table{
     vertical-align: top;
     border: 1px solid #000;
     margin: 10px;
+    padding: 5px;
     text-align: center;
     @include pc-layout{
         font-size: 12px;
@@ -44,29 +44,38 @@ table{
     @include sp-layout{
     }
 }
+
+tr{
+    &.calendar__month{
+        font-weight: bold;
+    }
+    &.calendar__week{
+        font-style: italic;
+    }
+}
+
+
 td{
     padding: 5px;
     @for $i from 0 through 6 {
-        &[data-weekday-type="#{$i}"]{
+        &[data-dayofweek-type="#{$i}"]{
 
         }
     }
-    // 週ラベル
-    &[data-weekday-type]{
-        font-style: italic; 
+
+    // 日付部分
+    &[data-day-index]{
+        color: #666;
     }
     // 日
-    &[data-weekday-type="0"]{
+    &[data-dayofweek-type="0"]{
         color: red;
     }
     // 土
-    &[data-weekday-type="6"]{
+    &[data-dayofweek-type="6"]{
         color: blue;
     }
-    // 日付部分
-    &[data-day-index]{
-        font-weight: bold;
-    }
+
     &.is-today{
         background-color: skyblue;
     }

@@ -63,27 +63,32 @@ table {
     .calendar {
       width: 375px; } }
   .calendar[data-type="month"] table {
-    font-size: 24px; }
+    font-size: 26px; }
 
 table {
   display: inline-block;
   vertical-align: top;
   border: 1px solid #000;
   margin: 10px;
+  padding: 5px;
   text-align: center; }
   @media (min-width: 800px) {
     table {
       font-size: 12px; } }
 
+tr.calendar__month {
+  font-weight: bold; }
+
+tr.calendar__week {
+  font-style: italic; }
+
 td {
   padding: 5px; }
-  td[data-weekday-type] {
-    font-style: italic; }
-  td[data-weekday-type="0"] {
-    color: red; }
-  td[data-weekday-type="6"] {
-    color: blue; }
   td[data-day-index] {
-    font-weight: bold; }
+    color: #666; }
+  td[data-dayofweek-type="0"] {
+    color: red; }
+  td[data-dayofweek-type="6"] {
+    color: blue; }
   td.is-today {
     background-color: skyblue; }

@@ -36,11 +36,14 @@ export default class Month {
         this.insertWeekLabel($table);
 
         for(let i = 0; i < rowNum; i++) {
-            let $tr = $(`<tr data-row-index="${i+1}"></tr>`);
+            let $tr = $(`<tr data-week-index="${i+1}"></tr>`);
             for(let j = 0; j < this.info.columnNum; j++) {
-                let day = cells[j+(i*this.info.columnNum)];
+                let cellIndex = j+(i*this.info.columnNum);
+                let day = cells[cellIndex];
                 let $td = day 
-                    ? $(`<td data-day-index="${day}">${day}</td>`)
+                    ? $(`<td data-day-index="${day}" 
+                        data-dayofweek-type="${cellIndex%this.info.columnNum}">
+                        ${day}</td>`)
                     : $(`<td></td>`);
                 if(month === ds.month && day === ds.today){
                     $td.addClass("is-today");
@@ -54,18 +57,18 @@ export default class Month {
 
     insertMonthLabel($table, month) {
         $table.append(
-            $(`<tr data-month-index="${month}">
+            $(`<tr class="calendar__month" data-month-index="${month}">
                 <td colspan="${this.info.columnNum}">${this.info.label.month[month-1]}</td>
             </tr>`)
         );
     }
 
     insertWeekLabel($table) {
-        let $tr = $(`<tr></tr>`);
+        let $tr = $(`<tr class="calendar__week"></tr>`);
         _.each(this.info.label.week, (elm,index) => {
             let key = Object.keys(elm)[0];
             $tr.append(
-                $(`<td data-weekday-type="${key}">${elm[key]}</td>`)
+                $(`<td data-dayofweek-type="${key}">${elm[key]}</td>`)
             )
         })
         $table.append($tr);
