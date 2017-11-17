@@ -84,11 +84,23 @@ tr.calendar__week {
 
 td {
   padding: 5px; }
-  td[data-day-index] {
-    color: #666; }
-  td[data-dayofweek-type="0"] {
-    color: red; }
-  td[data-dayofweek-type="6"] {
-    color: blue; }
   td.is-today {
-    background-color: skyblue; }
+    background-color: orange; }
+
+.calendar[data-type="year"] .calendar__month {
+  text-align: left; }
+
+.calendar[data-type="year"] .calendar__week {
+  display: none; }
+
+.calendar[data-type="year"] .is-thisMonth {
+  color: orange; }
+
+.calendar[data-type="month"] td[data-day-index] {
+  color: #666; }
+
+.calendar[data-type="month"] td[data-dayofweek-type="0"] {
+  color: red; }
+
+.calendar[data-type="month"] td[data-dayofweek-type="6"] {
+  color: blue; }

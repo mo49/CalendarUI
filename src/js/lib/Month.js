@@ -27,12 +27,12 @@ export default class Month {
             cells[i+firstDayOfWeekIndex] = i+1;
         }
 
-        return this.createTable(month, rowNum, cells, colspan);
+        return this.createTable(month, rowNum, cells);
     }
 
-    createTable(month, rowNum, cells, colspan) {
+    createTable(month, rowNum, cells) {
         let $table = $(`<table data-month-index="${month}"><tbody></tbody></table>`);
-        this.insertMonthLabel($table, month, colspan);
+        this.insertMonthLabel($table, month);
         this.insertWeekLabel($table);
 
         for(let i = 0; i < rowNum; i++) {
@@ -41,9 +41,7 @@ export default class Month {
                 let cellIndex = j+(i*this.info.columnNum);
                 let day = cells[cellIndex];
                 let $td = day 
-                    ? $(`<td data-day-index="${day}" 
-                        data-dayofweek-type="${cellIndex%this.info.columnNum}">
-                        ${day}</td>`)
+                    ? $(`<td data-day-index="${day}" data-dayofweek-type="${cellIndex%this.info.columnNum}">${day}</td>`)
                     : $(`<td></td>`);
                 if(month === ds.month && day === ds.today){
                     $td.addClass("is-today");
@@ -55,12 +53,13 @@ export default class Month {
         return $table;
     }
 
-    insertMonthLabel($table, month, colspan=this.info.columnNum) {
-        $table.append(
-            $(`<tr class="calendar__month" data-month-index="${month}">
-                <td colspan="${colspan}">${this.info.label.month[month-1]}</td>
-            </tr>`)
-        );
+    insertMonthLabel($table, month) {
+        let $tr = $(`<tr class="calendar__month" data-month-index="${month}">
+                        <td colspan="${this.info.columnNum}" class="${month === ds.month ? 'is-thisMonth' : ''}">
+                            ${this.info.label.month[month-1]}
+                        </td>
+                    </tr>`);
+        $table.append($tr);
     }
 
     insertWeekLabel($table) {

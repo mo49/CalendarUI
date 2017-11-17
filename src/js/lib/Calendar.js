@@ -74,11 +74,11 @@ export default class Calendar {
         $target.append($(`<p class='calendar__year'>${ds.year}</p>`));
     }
 
-    insertMonth($target, index, colspan) {
+    insertMonth($target, index) {
         const month = new Month({
             info: this.info,
         })
-        const monthTable = month.createMonth(index, colspan);
+        const monthTable = month.createMonth(index);
         $target.append(monthTable);
     }
 

@@ -63,21 +63,37 @@ td{
         }
     }
 
-    // 日付部分
-    &[data-day-index]{
-        color: #666;
-    }
-    // 日
-    &[data-dayofweek-type="0"]{
-        color: red;
-    }
-    // 土
-    &[data-dayofweek-type="6"]{
-        color: blue;
-    }
-
     &.is-today{
-        background-color: skyblue;
+        background-color: orange;
+    }
+}
+
+
+.calendar[data-type="year"]{
+    .calendar__month{
+        text-align: left;
+    }
+    .calendar__week{
+        display: none;
+    }
+    .is-thisMonth{
+        color: orange;
+    }
+}
+.calendar[data-type="month"]{
+    td{
+        // 日付部分
+        &[data-day-index]{
+            color: #666;
+        }
+        // 日
+        &[data-dayofweek-type="0"]{
+            color: red;
+        }
+        // 土
+        &[data-dayofweek-type="6"]{
+            color: blue;
+        }
     }
 }
 

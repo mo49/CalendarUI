@@ -22840,11 +22840,11 @@ var Calendar = function () {
         }
     }, {
         key: 'insertMonth',
-        value: function insertMonth($target, index, colspan) {
+        value: function insertMonth($target, index) {
             var month = new _Month2.default({
                 info: this.info
             });
-            var monthTable = month.createMonth(index, colspan);
+            var monthTable = month.createMonth(index);
             $target.append(monthTable);
         }
     }, {
@@ -22995,13 +22995,13 @@ var Month = function () {
                 cells[i + firstDayOfWeekIndex] = i + 1;
             }
 
-            return this.createTable(month, rowNum, cells, colspan);
+            return this.createTable(month, rowNum, cells);
         }
     }, {
         key: 'createTable',
-        value: function createTable(month, rowNum, cells, colspan) {
+        value: function createTable(month, rowNum, cells) {
             var $table = (0, _jquery2.default)('<table data-month-index="' + month + '"><tbody></tbody></table>');
-            this.insertMonthLabel($table, month, colspan);
+            this.insertMonthLabel($table, month);
             this.insertWeekLabel($table);
 
             for (var i = 0; i < rowNum; i++) {
@@ -23009,7 +23009,7 @@ var Month = function () {
                 for (var j = 0; j < this.info.columnNum; j++) {
                     var cellIndex = j + i * this.info.columnNum;
                     var day = cells[cellIndex];
-                    var $td = day ? (0, _jquery2.default)('<td data-day-index="' + day + '" \n                        data-dayofweek-type="' + cellIndex % this.info.columnNum + '">\n                        ' + day + '</td>') : (0, _jquery2.default)('<td></td>');
+                    var $td = day ? (0, _jquery2.default)('<td data-day-index="' + day + '" data-dayofweek-type="' + cellIndex % this.info.columnNum + '">' + day + '</td>') : (0, _jquery2.default)('<td></td>');
                     if (month === _DateSingleton2.default.month && day === _DateSingleton2.default.today) {
                         $td.addClass("is-today");
                     }
@@ -23022,9 +23022,8 @@ var Month = function () {
     }, {
         key: 'insertMonthLabel',
         value: function insertMonthLabel($table, month) {
-            var colspan = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : this.info.columnNum;
-
-            $table.append((0, _jquery2.default)('<tr class="calendar__month" data-month-index="' + month + '">\n                <td colspan="' + colspan + '">' + this.info.label.month[month - 1] + '</td>\n            </tr>'));
+            var $tr = (0, _jquery2.default)('<tr class="calendar__month" data-month-index="' + month + '">\n                        <td colspan="' + this.info.columnNum + '" class="' + (month === _DateSingleton2.default.month ? 'is-thisMonth' : '') + '">\n                            ' + this.info.label.month[month - 1] + '\n                        </td>\n                    </tr>');
+            $table.append($tr);
         }
     }, {
         key: 'insertWeekLabel',
