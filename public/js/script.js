@@ -23056,7 +23056,7 @@ var Month = function () {
                 for (var j = 0; j < this.info.columnNum; j++) {
                     var cellIndex = j + i * this.info.columnNum;
                     var day = cells[cellIndex];
-                    var $td = day ? (0, _jquery2.default)('<td class="js-zoom-day" data-day-index="' + day + '" data-dayofweek-type="' + cellIndex % this.info.columnNum + '">' + day + '</td>') : (0, _jquery2.default)('<td></td>');
+                    var $td = day ? (0, _jquery2.default)('<td class="js-zoom-day" data-day-index="' + day + '" data-dayofweek-type="' + (cellIndex - this.info.firstDayOfWeekOffset) % this.info.columnNum + '">' + day + '</td>') : (0, _jquery2.default)('<td></td>');
                     if (month === _DateSingleton2.default.month && day === _DateSingleton2.default.today) {
                         $td.addClass("is-today");
                     }

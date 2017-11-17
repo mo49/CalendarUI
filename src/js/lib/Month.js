@@ -40,7 +40,7 @@ export default class Month {
                 let cellIndex = j+(i*this.info.columnNum);
                 let day = cells[cellIndex];
                 let $td = day 
-                    ? $(`<td class="js-zoom-day" data-day-index="${day}" data-dayofweek-type="${cellIndex%this.info.columnNum}">${day}</td>`)
+                    ? $(`<td class="js-zoom-day" data-day-index="${day}" data-dayofweek-type="${(cellIndex-this.info.firstDayOfWeekOffset)%this.info.columnNum}">${day}</td>`)
                     : $(`<td></td>`);
                 if(month === ds.month && day === ds.today){
                     $td.addClass("is-today");
