@@ -8,7 +8,7 @@ export default class Month {
         console.log(this.info);
     }
 
-    createMonth(month) {
+    createMonth(month, colspan) {
         const date = new Date(ds.year, month - 1, 1);
 
         // その月の1日が何曜日なのか / 日 ~ 土 0 ~ 6
@@ -27,12 +27,12 @@ export default class Month {
             cells[i+firstDayOfWeekIndex] = i+1;
         }
 
-        return this.createTable(month, rowNum, cells);
+        return this.createTable(month, rowNum, cells, colspan);
     }
 
-    createTable(month, rowNum, cells) {
+    createTable(month, rowNum, cells, colspan) {
         let $table = $(`<table data-month-index="${month}"><tbody></tbody></table>`);
-        this.insertMonthLabel($table, month);
+        this.insertMonthLabel($table, month, colspan);
         this.insertWeekLabel($table);
 
         for(let i = 0; i < rowNum; i++) {
@@ -55,10 +55,10 @@ export default class Month {
         return $table;
     }
 
-    insertMonthLabel($table, month) {
+    insertMonthLabel($table, month, colspan=this.info.columnNum) {
         $table.append(
             $(`<tr class="calendar__month" data-month-index="${month}">
-                <td colspan="${this.info.columnNum}">${this.info.label.month[month-1]}</td>
+                <td colspan="${colspan}">${this.info.label.month[month-1]}</td>
             </tr>`)
         );
     }

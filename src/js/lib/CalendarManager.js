@@ -25,18 +25,17 @@ class CalendarManager {
         });
         calendar.createYearCalendar($(`.calendar[data-type="year"]`));
     
-        // 年カレンダーの中の月をクリック
+        // 年間カレンダーの中の月をクリック
         $(`.calendar[data-type="year"] table`).on("click", evt => {
             const monthIndex = evt.currentTarget.getAttribute("data-month-index") | 0;
             calendar.createMonthCalendar($(`.calendar[data-type="month"]`), monthIndex);
         })
     
-        // 月カレンダーの中の日にちをクリック
-        // new Calendar({
-        //     $calendar: $(".calendar[data-type='day']"),
-        //     type: 'day',
-        //     // 日を渡す
-        // });
+        // 月間カレンダーの中の日にちをクリック
+        $(`.calendar[data-type="month"] td[data-day-index]`).on("click", evt => {
+            const dayIndex = evt.currentTarget.getAttribute("data-day-index") | 0;
+            calendar.createDayCalendar($(`.calendar[data-type="day"]`), dayIndex);
+        })
     }
 }
 

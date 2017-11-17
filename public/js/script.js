@@ -22840,11 +22840,11 @@ var Calendar = function () {
         }
     }, {
         key: 'insertMonth',
-        value: function insertMonth($target, index) {
+        value: function insertMonth($target, index, colspan) {
             var month = new _Month2.default({
                 info: this.info
             });
-            var monthTable = month.createMonth(index);
+            var monthTable = month.createMonth(index, colspan);
             $target.append(monthTable);
         }
     }, {
@@ -22909,18 +22909,17 @@ var CalendarManager = function () {
             });
             calendar.createYearCalendar((0, _jquery2.default)('.calendar[data-type="year"]'));
 
-            // 年カレンダーの中の月をクリック
+            // 年間カレンダーの中の月をクリック
             (0, _jquery2.default)('.calendar[data-type="year"] table').on("click", function (evt) {
                 var monthIndex = evt.currentTarget.getAttribute("data-month-index") | 0;
                 calendar.createMonthCalendar((0, _jquery2.default)('.calendar[data-type="month"]'), monthIndex);
             });
 
-            // 月カレンダーの中の日にちをクリック
-            // new Calendar({
-            //     $calendar: $(".calendar[data-type='day']"),
-            //     type: 'day',
-            //     // 日を渡す
-            // });
+            // 月間カレンダーの中の日にちをクリック
+            (0, _jquery2.default)('.calendar[data-type="month"] td[data-day-index]').on("click", function (evt) {
+                var dayIndex = evt.currentTarget.getAttribute("data-day-index") | 0;
+                calendar.createDayCalendar((0, _jquery2.default)('.calendar[data-type="day"]'), dayIndex);
+            });
         }
     }]);
     return CalendarManager;
@@ -22977,7 +22976,7 @@ var Month = function () {
 
     (0, _createClass3.default)(Month, [{
         key: 'createMonth',
-        value: function createMonth(month) {
+        value: function createMonth(month, colspan) {
             var date = new Date(_DateSingleton2.default.year, month - 1, 1);
 
             // その月の1日が何曜日なのか / 日 ~ 土 0 ~ 6
@@ -22996,13 +22995,13 @@ var Month = function () {
                 cells[i + firstDayOfWeekIndex] = i + 1;
             }
 
-            return this.createTable(month, rowNum, cells);
+            return this.createTable(month, rowNum, cells, colspan);
         }
     }, {
         key: 'createTable',
-        value: function createTable(month, rowNum, cells) {
+        value: function createTable(month, rowNum, cells, colspan) {
             var $table = (0, _jquery2.default)('<table data-month-index="' + month + '"><tbody></tbody></table>');
-            this.insertMonthLabel($table, month);
+            this.insertMonthLabel($table, month, colspan);
             this.insertWeekLabel($table);
 
             for (var i = 0; i < rowNum; i++) {
@@ -23023,7 +23022,9 @@ var Month = function () {
     }, {
         key: 'insertMonthLabel',
         value: function insertMonthLabel($table, month) {
-            $table.append((0, _jquery2.default)('<tr class="calendar__month" data-month-index="' + month + '">\n                <td colspan="' + this.info.columnNum + '">' + this.info.label.month[month - 1] + '</td>\n            </tr>'));
+            var colspan = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : this.info.columnNum;
+
+            $table.append((0, _jquery2.default)('<tr class="calendar__month" data-month-index="' + month + '">\n                <td colspan="' + colspan + '">' + this.info.label.month[month - 1] + '</td>\n            </tr>'));
         }
     }, {
         key: 'insertWeekLabel',
