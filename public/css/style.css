@@ -104,3 +104,15 @@ td {
 
 .calendar[data-type="month"] td[data-dayofweek-type="6"] {
   color: blue; }
+
+.calendar[data-type="day"] .is-center {
+  background-color: skyblue; }
+
+.calendar[data-type="day"] td[data-day-index] {
+  color: #666; }
+
+.calendar[data-type="day"] td[data-dayofweek-type="0"] {
+  color: red; }
+
+.calendar[data-type="day"] td[data-dayofweek-type="6"] {
+  color: blue; }

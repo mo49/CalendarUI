@@ -22730,6 +22730,30 @@ module.exports = info;
 },{"babel-runtime/core-js/object/freeze":2}],49:[function(require,module,exports){
 'use strict';
 
+var _freeze = require('babel-runtime/core-js/object/freeze');
+
+var _freeze2 = _interopRequireDefault(_freeze);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+var info = {
+    month: {
+        ja: ['1月', '2月', '3月', '4月', '5月', '6月', '7月', '8月', '9月', '10月', '11月', '12月'],
+        en: ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
+    },
+    week: {
+        ja: [{ 0: '日' }, { 1: '月' }, { 2: '火' }, { 3: '水' }, { 4: '木' }, { 5: '金' }, { 6: '土' }],
+        en: [{ 0: 'Sun' }, { 1: 'Mon' }, { 2: 'Tue' }, { 3: 'Wed' }, { 4: 'Thu' }, { 5: 'Fri' }, { 6: 'Sat' }]
+    }
+};
+
+(0, _freeze2.default)(info);
+
+module.exports = info;
+
+},{"babel-runtime/core-js/object/freeze":2}],50:[function(require,module,exports){
+'use strict';
+
 Object.defineProperty(exports, "__esModule", {
     value: true
 });
@@ -22785,8 +22809,12 @@ var Calendar = function () {
         this.info = {
             columnNum: isNaN(opts.columnNum) ? 7 : opts.columnNum,
             monthRange: isNaN(opts.monthRange) ? null : opts.monthRange,
-            dayRange: isNaN(opts.dayRange) ? null : opts.dayRange,
+            dayRange: isNaN(opts.dayRange) ? 7 : opts.dayRange,
             firstDayOfWeekOffset: isNaN(opts.firstDayOfWeekOffset) ? null : opts.firstDayOfWeekOffset,
+            lang: {
+                month: opts.lang ? opts.lang.month || 'ja' : 'ja',
+                week: opts.lang ? opts.lang.week || 'en' : 'en'
+            },
             label: {
                 month: opts.lang ? _Info2.default.month[opts.lang.month] || _Info2.default.month.ja : _Info2.default.month.ja,
                 week: opts.lang ? _Info2.default.week[opts.lang.week] || _Info2.default.week.en : _Info2.default.week.en
@@ -22825,16 +22853,23 @@ var Calendar = function () {
                 return;
             }
             $target.empty();
+            $target.attr("data-month-index", monthIndex);
             this.insertYearLabel($target);
             this.insertMonth($target, monthIndex);
         }
     }, {
         key: 'createDayCalendar',
-        value: function createDayCalendar($target) {
+        value: function createDayCalendar($target, monthIndex, dayIndex) {
             if (!$target) {
                 return;
             }
-            this.insertOneLiner($target);
+            $target.empty();
+            $target.attr({
+                "data-month-index": monthIndex,
+                "data-day-index": dayIndex
+            });
+            this.insertYearLabel($target);
+            this.insertOneLiner($target, monthIndex, dayIndex);
         }
     }, {
         key: 'insertYearLabel',
@@ -22852,12 +22887,12 @@ var Calendar = function () {
         }
     }, {
         key: 'insertOneLiner',
-        value: function insertOneLiner($target) {
+        value: function insertOneLiner($target, monthIndex, dayIndex) {
             // columnは必ずしも7ではないので、weekではなくone-linerと命名
             var oneLiner = new _OneLiner2.default({
                 info: this.info
             });
-            var oneLinerTable = oneLiner.createOneLiner();
+            var oneLinerTable = oneLiner.createOneLiner(monthIndex, dayIndex);
             $target.append(oneLinerTable);
         }
     }]);
@@ -22867,7 +22902,7 @@ var Calendar = function () {
 Calendar.MAX_MONTH = 12;
 exports.default = Calendar;
 
-},{"../data/DateSingleton":47,"../data/Info":48,"./Month":51,"./OneLiner":52,"babel-runtime/helpers/classCallCheck":4,"babel-runtime/helpers/createClass":5,"jquery":45,"lodash":46}],50:[function(require,module,exports){
+},{"../data/DateSingleton":47,"../data/Info":48,"./Month":52,"./OneLiner":53,"babel-runtime/helpers/classCallCheck":4,"babel-runtime/helpers/createClass":5,"jquery":45,"lodash":46}],51:[function(require,module,exports){
 'use strict';
 
 var _classCallCheck2 = require('babel-runtime/helpers/classCallCheck');
@@ -22898,8 +22933,14 @@ var CalendarManager = function () {
     (0, _createClass3.default)(CalendarManager, [{
         key: 'init',
         value: function init() {
+            var CALENDAR_YEAR = '.calendar[data-type="year"]';
+            var CALENDAR_MONTH = '.calendar[data-type="month"]';
+            var CALENDAR_DAY = '.calendar[data-type="day"]';
+
+            var zoomMonth = CALENDAR_YEAR + ' .js-zoom-month';
+            var zoomDay = CALENDAR_MONTH + ' .js-zoom-day';
+
             var calendar = new _Calendar2.default({
-                $calendar: (0, _jquery2.default)(".calendar[data-type='year']")
                 // monthRange: 5, // 年カレンダーの表示数（奇数のみ）
                 // dayRange: 5, // 日カレンダーの表示数（5 or 7）
                 // virtual:{
@@ -22913,21 +22954,19 @@ var CalendarManager = function () {
                 // },
                 // firstDayOfWeekOffset: 1, // 曜日始まりが1つ右にずれる
             });
-            calendar.createYearCalendar((0, _jquery2.default)('.calendar[data-type="year"]'));
-
-            var zoomMonth = '.calendar[data-type="year"] .js-zoom-month';
-            var zoomDay = '.calendar[data-type="month"] .js-zoom-day';
+            calendar.createYearCalendar((0, _jquery2.default)(CALENDAR_YEAR));
 
             // 年間カレンダーの中の月をクリック
             (0, _jquery2.default)(document).delegate(zoomMonth, 'click', function (evt) {
                 var monthIndex = evt.currentTarget.getAttribute("data-month-index") | 0;
-                calendar.createMonthCalendar((0, _jquery2.default)('.calendar[data-type="month"]'), monthIndex);
+                calendar.createMonthCalendar((0, _jquery2.default)(CALENDAR_MONTH), monthIndex);
             });
 
             // 月間カレンダーの中の日にちをクリック
             (0, _jquery2.default)(document).delegate(zoomDay, 'click', function (evt) {
+                var monthIndex = (0, _jquery2.default)(CALENDAR_MONTH + ' table').attr("data-month-index") | 0;
                 var dayIndex = evt.currentTarget.getAttribute("data-day-index") | 0;
-                calendar.createDayCalendar((0, _jquery2.default)('.calendar[data-type="day"]'), dayIndex);
+                calendar.createDayCalendar((0, _jquery2.default)(CALENDAR_DAY), monthIndex, dayIndex);
             });
         }
     }]);
@@ -22941,7 +22980,7 @@ http://www.frontendmemo.xyz/entry/2017/02/04/044306
 http://phiary.me/js-get-month-days/
 */
 
-},{"./Calendar":49,"babel-runtime/helpers/classCallCheck":4,"babel-runtime/helpers/createClass":5,"jquery":45}],51:[function(require,module,exports){
+},{"./Calendar":50,"babel-runtime/helpers/classCallCheck":4,"babel-runtime/helpers/createClass":5,"jquery":45}],52:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -22980,7 +23019,6 @@ var Month = function () {
         (0, _classCallCheck3.default)(this, Month);
 
         this.info = opts.info || null;
-        console.log(this.info);
     }
 
     (0, _createClass3.default)(Month, [{
@@ -23061,7 +23099,7 @@ var Month = function () {
 
 exports.default = Month;
 
-},{"../data/DateSingleton":47,"babel-runtime/core-js/object/keys":3,"babel-runtime/helpers/classCallCheck":4,"babel-runtime/helpers/createClass":5,"jquery":45,"lodash":46}],52:[function(require,module,exports){
+},{"../data/DateSingleton":47,"babel-runtime/core-js/object/keys":3,"babel-runtime/helpers/classCallCheck":4,"babel-runtime/helpers/createClass":5,"jquery":45,"lodash":46}],53:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -23084,6 +23122,10 @@ var _lodash = require('lodash');
 
 var _lodash2 = _interopRequireDefault(_lodash);
 
+var _info = require('../data/info');
+
+var _info2 = _interopRequireDefault(_info);
+
 var _DateSingleton = require('../data/DateSingleton');
 
 var _DateSingleton2 = _interopRequireDefault(_DateSingleton);
@@ -23100,23 +23142,64 @@ var OneLiner = function () {
 
     (0, _createClass3.default)(OneLiner, [{
         key: 'createOneLiner',
-        value: function createOneLiner() {
+        value: function createOneLiner(monthIndex, dayIndex) {
 
-            for (var i = 0; i < this.info.dayRange; i++) {
-                console.log(i);
+            // 選択している日が中央にくる
+            var $table = (0, _jquery2.default)('<table><tr></tr></table>');
+            var selectedDate = new Date(_DateSingleton2.default.year, monthIndex - 1, dayIndex);
+            var centerId = Math.ceil(this.info.dayRange / 2); // 5 -> 3
+            var startDayIndex = dayIndex - centerId;
+            var firstDayOfWeekIndex = this.getDayOfWeekIndex(selectedDate.getDay() - centerId + 1);
+
+            console.log(firstDayOfWeekIndex);
+
+            this.insertWeekLabel($table, firstDayOfWeekIndex);
+
+            for (var i = 1; i <= this.info.dayRange; i++) {
+                var $td = (0, _jquery2.default)('<td data-oneliner-index="' + i + '"></td>');
+                if (i === centerId) {
+                    $td.addClass("is-center");
+                }
+                if (startDayIndex + i > 0) {
+                    $td.text(startDayIndex + i);
+                }
+                $table.append($td);
             }
-            // return table;
+            return $table;
         }
     }, {
         key: 'insertWeekLabel',
-        value: function insertWeekLabel() {}
+        value: function insertWeekLabel($table, firstDayOfWeekIndex) {
+            var week = _info2.default.week[this.info.lang.week];
+            var $tr = (0, _jquery2.default)('<tr class="calendar__week"></tr>');
+            for (var i = 0; i < this.info.dayRange; i++) {
+                var key = this.getDayOfWeekIndex(firstDayOfWeekIndex + i);
+                var $td = (0, _jquery2.default)('<td data-dayofweek-type="' + key + '">' + week[key][key] + '</td>');
+                $tr.append($td);
+            }
+            $table.append($tr);
+        }
+    }, {
+        key: 'getDayOfWeekIndex',
+        value: function getDayOfWeekIndex(day) {
+            var WEEK_NUM = 7;
+            // under
+            if (day < 0) {
+                day = WEEK_NUM + day % WEEK_NUM;
+            }
+            // over
+            if (day >= WEEK_NUM) {
+                day = day % 7;
+            }
+            return day;
+        }
     }]);
     return OneLiner;
 }();
 
 exports.default = OneLiner;
 
-},{"../data/DateSingleton":47,"babel-runtime/helpers/classCallCheck":4,"babel-runtime/helpers/createClass":5,"jquery":45,"lodash":46}],53:[function(require,module,exports){
+},{"../data/DateSingleton":47,"../data/info":49,"babel-runtime/helpers/classCallCheck":4,"babel-runtime/helpers/createClass":5,"jquery":45,"lodash":46}],54:[function(require,module,exports){
 'use strict';
 
 var _jquery = require('jquery');
@@ -23129,4 +23212,4 @@ var _CalendarManager2 = _interopRequireDefault(_CalendarManager);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-},{"./lib/CalendarManager":50,"jquery":45}]},{},[53]);
+},{"./lib/CalendarManager":51,"jquery":45}]},{},[54]);

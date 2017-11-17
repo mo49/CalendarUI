@@ -96,5 +96,26 @@ td{
         }
     }
 }
+.calendar[data-type="day"]{
+    .is-center{
+        background-color: skyblue;
+    }
+    td{
+        // 日付部分
+        &[data-day-index]{
+            color: #666;
+        }
+        // 日
+        &[data-dayofweek-type="0"]{
+            color: red;
+        }
+        // 土
+        &[data-dayofweek-type="6"]{
+            color: blue;
+        }
+    }
+}
+
+
 
 

@@ -22,8 +22,12 @@ export default class Calendar {
         this.info = {
             columnNum: isNaN(opts.columnNum) ? 7 : opts.columnNum,
             monthRange: isNaN(opts.monthRange) ? null : opts.monthRange,
-            dayRange: isNaN(opts.dayRange) ? null : opts.dayRange,
+            dayRange: isNaN(opts.dayRange) ? 7 : opts.dayRange,
             firstDayOfWeekOffset: isNaN(opts.firstDayOfWeekOffset) ? null : opts.firstDayOfWeekOffset,
+            lang: {
+                month: opts.lang ? opts.lang.month || 'ja' : 'ja',
+                week: opts.lang ? opts.lang.week || 'en' : 'en',
+            },
             label: {
                 month: opts.lang ? info.month[opts.lang.month] || info.month.ja : info.month.ja,
                 week: opts.lang ? info.week[opts.lang.week] || info.week.en : info.week.en,
@@ -59,15 +63,22 @@ export default class Calendar {
             return;
         }
         $target.empty();
+        $target.attr("data-month-index", monthIndex);
         this.insertYearLabel($target);
         this.insertMonth($target, monthIndex);
     }
 
-    createDayCalendar($target) {
+    createDayCalendar($target, monthIndex, dayIndex) {
         if(!$target){
             return;
         }
-        this.insertOneLiner($target);
+        $target.empty();
+        $target.attr({
+            "data-month-index": monthIndex,
+            "data-day-index": dayIndex
+        })
+        this.insertYearLabel($target);
+        this.insertOneLiner($target, monthIndex, dayIndex);
     }
 
     insertYearLabel($target) {
@@ -82,12 +93,12 @@ export default class Calendar {
         $target.append(monthTable);
     }
 
-    insertOneLiner($target) {
+    insertOneLiner($target, monthIndex, dayIndex) {
         // columnは必ずしも7ではないので、weekではなくone-linerと命名
         const oneLiner = new OneLiner({
             info: this.info,
         })
-        const oneLinerTable = oneLiner.createOneLiner();
+        const oneLinerTable = oneLiner.createOneLiner(monthIndex, dayIndex);
         $target.append(oneLinerTable);
     }
 

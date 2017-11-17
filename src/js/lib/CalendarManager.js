@@ -8,8 +8,14 @@ class CalendarManager {
     }
 
     init() {
+        const CALENDAR_YEAR = `.calendar[data-type="year"]`;
+        const CALENDAR_MONTH = `.calendar[data-type="month"]`;
+        const CALENDAR_DAY = `.calendar[data-type="day"]`;
+
+        const zoomMonth = `${CALENDAR_YEAR} .js-zoom-month`;
+        const zoomDay = `${CALENDAR_MONTH} .js-zoom-day`;
+
         const calendar = new Calendar({
-            $calendar: $(".calendar[data-type='year']"),
             // monthRange: 5, // 年カレンダーの表示数（奇数のみ）
             // dayRange: 5, // 日カレンダーの表示数（5 or 7）
             // virtual:{
@@ -23,21 +29,19 @@ class CalendarManager {
             // },
             // firstDayOfWeekOffset: 1, // 曜日始まりが1つ右にずれる
         });
-        calendar.createYearCalendar($(`.calendar[data-type="year"]`));
-
-        const zoomMonth = `.calendar[data-type="year"] .js-zoom-month`;
-        const zoomDay = `.calendar[data-type="month"] .js-zoom-day`;
+        calendar.createYearCalendar($(CALENDAR_YEAR));
     
         // 年間カレンダーの中の月をクリック
         $(document).delegate(zoomMonth, 'click', evt => {
-            const monthIndex = evt.currentTarget.getAttribute("data-month-index") | 0;
-            calendar.createMonthCalendar($(`.calendar[data-type="month"]`), monthIndex);
+            let monthIndex = evt.currentTarget.getAttribute("data-month-index") | 0;
+            calendar.createMonthCalendar($(CALENDAR_MONTH), monthIndex);
         })
     
         // 月間カレンダーの中の日にちをクリック
         $(document).delegate(zoomDay, 'click', evt => {
-            const dayIndex = evt.currentTarget.getAttribute("data-day-index") | 0;
-            calendar.createDayCalendar($(`.calendar[data-type="day"]`), dayIndex);
+            let monthIndex = $(`${CALENDAR_MONTH} table`).attr("data-month-index") | 0;
+            let dayIndex = evt.currentTarget.getAttribute("data-day-index") | 0;
+            calendar.createDayCalendar($(CALENDAR_DAY), monthIndex, dayIndex);
         })
     }
 }

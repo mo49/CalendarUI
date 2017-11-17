@@ -5,7 +5,6 @@ import ds from '../data/DateSingleton';
 export default class Month {
     constructor(opts={}) {
         this.info = opts.info || null;
-        console.log(this.info);
     }
 
     createMonth(month, colspan) {
