@@ -122,3 +122,6 @@ td {
 
 .calendar[data-type="day"] td[data-dayofweek-type="6"] {
   color: blue; }
+
+.calendar[data-type="day"] .js-change-day {
+  cursor: pointer; }

@@ -29,6 +29,7 @@ export default class OneLiner {
             }
             if(0 < dayIndex && dayIndex <= dayNum){
                 $td.text(dayIndex);
+                $td.addClass("js-change-day");
             }
             this.$table.append($td);
         }
@@ -36,11 +37,12 @@ export default class OneLiner {
     }
 
     insertMonthLabel(month) {
-        let $tr = $(`<tr class="calendar__month" data-month-index="${month}">
-                        <td colspan="${this.info.columnNum}">
-                            ${this.info.label.month[month-1]}
-                        </td>
-                    </tr>`);
+        let $tr = 
+            $(`<tr class="calendar__month" data-month-index="${month}">
+                <td colspan="${this.info.columnNum}">
+                    ${this.info.label.month[month-1]}
+                </td>
+            </tr>`);
         this.$table.append($tr);
     }
 

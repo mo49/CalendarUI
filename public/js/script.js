@@ -22939,6 +22939,7 @@ var CalendarManager = function () {
 
             var zoomMonth = CALENDAR_YEAR + ' .js-zoom-month';
             var zoomDay = CALENDAR_MONTH + ' .js-zoom-day';
+            var changeDay = CALENDAR_DAY + ' .js-change-day';
 
             var calendar = new _Calendar2.default({
                 // monthRange: 5, // 年カレンダーの表示数（奇数のみ）
@@ -22966,6 +22967,13 @@ var CalendarManager = function () {
             (0, _jquery2.default)(document).delegate(zoomDay, 'click', function (evt) {
                 var monthIndex = (0, _jquery2.default)(CALENDAR_MONTH + ' table').attr("data-month-index") | 0;
                 var dayIndex = evt.currentTarget.getAttribute("data-day-index") | 0;
+                calendar.createDayCalendar((0, _jquery2.default)(CALENDAR_DAY), monthIndex, dayIndex);
+            });
+
+            // 月間カレンダーの中の日にちをクリック
+            (0, _jquery2.default)(document).delegate(changeDay, 'click', function (evt) {
+                var monthIndex = (0, _jquery2.default)('' + CALENDAR_DAY).attr("data-month-index") | 0;
+                var dayIndex = evt.currentTarget.textContent | 0;
                 calendar.createDayCalendar((0, _jquery2.default)(CALENDAR_DAY), monthIndex, dayIndex);
             });
         }
@@ -23163,6 +23171,7 @@ var OneLiner = function () {
                 }
                 if (0 < _dayIndex && _dayIndex <= dayNum) {
                     $td.text(_dayIndex);
+                    $td.addClass("js-change-day");
                 }
                 this.$table.append($td);
             }
@@ -23171,7 +23180,7 @@ var OneLiner = function () {
     }, {
         key: 'insertMonthLabel',
         value: function insertMonthLabel(month) {
-            var $tr = (0, _jquery2.default)('<tr class="calendar__month" data-month-index="' + month + '">\n                        <td colspan="' + this.info.columnNum + '">\n                            ' + this.info.label.month[month - 1] + '\n                        </td>\n                    </tr>');
+            var $tr = (0, _jquery2.default)('<tr class="calendar__month" data-month-index="' + month + '">\n                <td colspan="' + this.info.columnNum + '">\n                    ' + this.info.label.month[month - 1] + '\n                </td>\n            </tr>');
             this.$table.append($tr);
         }
     }, {

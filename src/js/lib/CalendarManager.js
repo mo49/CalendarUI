@@ -14,6 +14,7 @@ class CalendarManager {
 
         const zoomMonth = `${CALENDAR_YEAR} .js-zoom-month`;
         const zoomDay = `${CALENDAR_MONTH} .js-zoom-day`;
+        const changeDay = `${CALENDAR_DAY} .js-change-day`;
 
         const calendar = new Calendar({
             // monthRange: 5, // 年カレンダーの表示数（奇数のみ）
@@ -43,6 +44,14 @@ class CalendarManager {
             let dayIndex = evt.currentTarget.getAttribute("data-day-index") | 0;
             calendar.createDayCalendar($(CALENDAR_DAY), monthIndex, dayIndex);
         })
+
+        // 月間カレンダーの中の日にちをクリック
+        $(document).delegate(changeDay, 'click', evt => {
+            let monthIndex = $(`${CALENDAR_DAY}`).attr("data-month-index") | 0;
+            let dayIndex = evt.currentTarget.textContent | 0;
+            calendar.createDayCalendar($(CALENDAR_DAY), monthIndex, dayIndex);
+        })
+
     }
 }
 
