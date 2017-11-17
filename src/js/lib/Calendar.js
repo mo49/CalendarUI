@@ -3,6 +3,7 @@ import _ from 'lodash';
 import info from '../data/Info';
 import ds from '../data/DateSingleton';
 import Month from './Month';
+import OneLiner from './OneLiner';
 
 /*
 [機能]
@@ -66,7 +67,6 @@ export default class Calendar {
         if(!$target){
             return;
         }
-        // 必ずしもcolumnは7ではないので、weekではなくone-linerと命名
         this.insertOneLiner($target);
     }
 
@@ -83,9 +83,12 @@ export default class Calendar {
     }
 
     insertOneLiner($target) {
-        // const oneLiner = new OneLiner({})
-        // const oneLinerTable = oneLiner.createOneLiner(info.dayRange);
-        // $target.append(oneLinerTable);
+        // columnは必ずしも7ではないので、weekではなくone-linerと命名
+        const oneLiner = new OneLiner({
+            info: this.info,
+        })
+        const oneLinerTable = oneLiner.createOneLiner();
+        $target.append(oneLinerTable);
     }
 
 }

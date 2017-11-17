@@ -31,7 +31,7 @@ export default class Month {
     }
 
     createTable(month, rowNum, cells) {
-        let $table = $(`<table data-month-index="${month}"><tbody></tbody></table>`);
+        let $table = $(`<table class="js-zoom-month" data-month-index="${month}"><tbody></tbody></table>`);
         this.insertMonthLabel($table, month);
         this.insertWeekLabel($table);
 
@@ -41,7 +41,7 @@ export default class Month {
                 let cellIndex = j+(i*this.info.columnNum);
                 let day = cells[cellIndex];
                 let $td = day 
-                    ? $(`<td data-day-index="${day}" data-dayofweek-type="${cellIndex%this.info.columnNum}">${day}</td>`)
+                    ? $(`<td class="js-zoom-day" data-day-index="${day}" data-dayofweek-type="${cellIndex%this.info.columnNum}">${day}</td>`)
                     : $(`<td></td>`);
                 if(month === ds.month && day === ds.today){
                     $td.addClass("is-today");

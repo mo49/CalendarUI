@@ -24,15 +24,18 @@ class CalendarManager {
             // firstDayOfWeekOffset: 1, // 曜日始まりが1つ右にずれる
         });
         calendar.createYearCalendar($(`.calendar[data-type="year"]`));
+
+        const zoomMonth = `.calendar[data-type="year"] .js-zoom-month`;
+        const zoomDay = `.calendar[data-type="month"] .js-zoom-day`;
     
         // 年間カレンダーの中の月をクリック
-        $(`.calendar[data-type="year"] table`).on("click", evt => {
+        $(document).delegate(zoomMonth, 'click', evt => {
             const monthIndex = evt.currentTarget.getAttribute("data-month-index") | 0;
             calendar.createMonthCalendar($(`.calendar[data-type="month"]`), monthIndex);
         })
     
         // 月間カレンダーの中の日にちをクリック
-        $(`.calendar[data-type="month"] td[data-day-index]`).on("click", evt => {
+        $(document).delegate(zoomDay, 'click', evt => {
             const dayIndex = evt.currentTarget.getAttribute("data-day-index") | 0;
             calendar.createDayCalendar($(`.calendar[data-type="day"]`), dayIndex);
         })

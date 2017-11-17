@@ -22762,6 +22762,10 @@ var _Month = require('./Month');
 
 var _Month2 = _interopRequireDefault(_Month);
 
+var _OneLiner = require('./OneLiner');
+
+var _OneLiner2 = _interopRequireDefault(_OneLiner);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 /*
@@ -22830,7 +22834,6 @@ var Calendar = function () {
             if (!$target) {
                 return;
             }
-            // 必ずしもcolumnは7ではないので、weekではなくone-linerと命名
             this.insertOneLiner($target);
         }
     }, {
@@ -22850,9 +22853,12 @@ var Calendar = function () {
     }, {
         key: 'insertOneLiner',
         value: function insertOneLiner($target) {
-            // const oneLiner = new OneLiner({})
-            // const oneLinerTable = oneLiner.createOneLiner(info.dayRange);
-            // $target.append(oneLinerTable);
+            // columnは必ずしも7ではないので、weekではなくone-linerと命名
+            var oneLiner = new _OneLiner2.default({
+                info: this.info
+            });
+            var oneLinerTable = oneLiner.createOneLiner();
+            $target.append(oneLinerTable);
         }
     }]);
     return Calendar;
@@ -22861,7 +22867,7 @@ var Calendar = function () {
 Calendar.MAX_MONTH = 12;
 exports.default = Calendar;
 
-},{"../data/DateSingleton":47,"../data/Info":48,"./Month":51,"babel-runtime/helpers/classCallCheck":4,"babel-runtime/helpers/createClass":5,"jquery":45,"lodash":46}],50:[function(require,module,exports){
+},{"../data/DateSingleton":47,"../data/Info":48,"./Month":51,"./OneLiner":52,"babel-runtime/helpers/classCallCheck":4,"babel-runtime/helpers/createClass":5,"jquery":45,"lodash":46}],50:[function(require,module,exports){
 'use strict';
 
 var _classCallCheck2 = require('babel-runtime/helpers/classCallCheck');
@@ -22909,14 +22915,17 @@ var CalendarManager = function () {
             });
             calendar.createYearCalendar((0, _jquery2.default)('.calendar[data-type="year"]'));
 
+            var zoomMonth = '.calendar[data-type="year"] .js-zoom-month';
+            var zoomDay = '.calendar[data-type="month"] .js-zoom-day';
+
             // 年間カレンダーの中の月をクリック
-            (0, _jquery2.default)('.calendar[data-type="year"] table').on("click", function (evt) {
+            (0, _jquery2.default)(document).delegate(zoomMonth, 'click', function (evt) {
                 var monthIndex = evt.currentTarget.getAttribute("data-month-index") | 0;
                 calendar.createMonthCalendar((0, _jquery2.default)('.calendar[data-type="month"]'), monthIndex);
             });
 
             // 月間カレンダーの中の日にちをクリック
-            (0, _jquery2.default)('.calendar[data-type="month"] td[data-day-index]').on("click", function (evt) {
+            (0, _jquery2.default)(document).delegate(zoomDay, 'click', function (evt) {
                 var dayIndex = evt.currentTarget.getAttribute("data-day-index") | 0;
                 calendar.createDayCalendar((0, _jquery2.default)('.calendar[data-type="day"]'), dayIndex);
             });
@@ -23000,7 +23009,7 @@ var Month = function () {
     }, {
         key: 'createTable',
         value: function createTable(month, rowNum, cells) {
-            var $table = (0, _jquery2.default)('<table data-month-index="' + month + '"><tbody></tbody></table>');
+            var $table = (0, _jquery2.default)('<table class="js-zoom-month" data-month-index="' + month + '"><tbody></tbody></table>');
             this.insertMonthLabel($table, month);
             this.insertWeekLabel($table);
 
@@ -23009,7 +23018,7 @@ var Month = function () {
                 for (var j = 0; j < this.info.columnNum; j++) {
                     var cellIndex = j + i * this.info.columnNum;
                     var day = cells[cellIndex];
-                    var $td = day ? (0, _jquery2.default)('<td data-day-index="' + day + '" data-dayofweek-type="' + cellIndex % this.info.columnNum + '">' + day + '</td>') : (0, _jquery2.default)('<td></td>');
+                    var $td = day ? (0, _jquery2.default)('<td class="js-zoom-day" data-day-index="' + day + '" data-dayofweek-type="' + cellIndex % this.info.columnNum + '">' + day + '</td>') : (0, _jquery2.default)('<td></td>');
                     if (month === _DateSingleton2.default.month && day === _DateSingleton2.default.today) {
                         $td.addClass("is-today");
                     }
@@ -23055,6 +23064,61 @@ exports.default = Month;
 },{"../data/DateSingleton":47,"babel-runtime/core-js/object/keys":3,"babel-runtime/helpers/classCallCheck":4,"babel-runtime/helpers/createClass":5,"jquery":45,"lodash":46}],52:[function(require,module,exports){
 'use strict';
 
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+
+var _classCallCheck2 = require('babel-runtime/helpers/classCallCheck');
+
+var _classCallCheck3 = _interopRequireDefault(_classCallCheck2);
+
+var _createClass2 = require('babel-runtime/helpers/createClass');
+
+var _createClass3 = _interopRequireDefault(_createClass2);
+
+var _jquery = require('jquery');
+
+var _jquery2 = _interopRequireDefault(_jquery);
+
+var _lodash = require('lodash');
+
+var _lodash2 = _interopRequireDefault(_lodash);
+
+var _DateSingleton = require('../data/DateSingleton');
+
+var _DateSingleton2 = _interopRequireDefault(_DateSingleton);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+var OneLiner = function () {
+    function OneLiner() {
+        var opts = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+        (0, _classCallCheck3.default)(this, OneLiner);
+
+        this.info = opts.info || null;
+    }
+
+    (0, _createClass3.default)(OneLiner, [{
+        key: 'createOneLiner',
+        value: function createOneLiner() {
+
+            for (var i = 0; i < this.info.dayRange; i++) {
+                console.log(i);
+            }
+            // return table;
+        }
+    }, {
+        key: 'insertWeekLabel',
+        value: function insertWeekLabel() {}
+    }]);
+    return OneLiner;
+}();
+
+exports.default = OneLiner;
+
+},{"../data/DateSingleton":47,"babel-runtime/helpers/classCallCheck":4,"babel-runtime/helpers/createClass":5,"jquery":45,"lodash":46}],53:[function(require,module,exports){
+'use strict';
+
 var _jquery = require('jquery');
 
 var _jquery2 = _interopRequireDefault(_jquery);
@@ -23065,4 +23129,4 @@ var _CalendarManager2 = _interopRequireDefault(_CalendarManager);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-},{"./lib/CalendarManager":50,"jquery":45}]},{},[52]);
+},{"./lib/CalendarManager":50,"jquery":45}]},{},[53]);
