@@ -54,27 +54,26 @@ table {
 * {
   box-sizing: border-box; }
 
-.calendar {
+.calendar__wrapper {
+  background-color: #fafafa;
   text-align: center; }
   @media (min-width: 800px) {
-    .calendar {
+    .calendar__wrapper {
       width: 800px; } }
   @media (max-width: 799px) {
-    .calendar {
+    .calendar__wrapper {
       width: 375px; } }
-  .calendar[data-type="month"] table {
-    font-size: 26px; }
+
+.calendar__year {
+  font-size: 24px;
+  margin-top: 30px; }
 
 table {
   display: inline-block;
   vertical-align: top;
   border: 1px solid #000;
   margin: 10px;
-  padding: 5px;
   text-align: center; }
-  @media (min-width: 800px) {
-    table {
-      font-size: 12px; } }
 
 tr.calendar__month {
   font-weight: bold; }
@@ -82,10 +81,17 @@ tr.calendar__month {
 tr.calendar__week {
   font-style: italic; }
 
-td {
-  padding: 5px; }
-  td.is-today {
-    background-color: orange; }
+td.is-today {
+  background-color: orange; }
+
+@media (min-width: 800px) {
+  .calendar[data-type="year"] {
+    font-size: 12px; } }
+
+@media (min-width: 800px) {
+  .calendar[data-type="year"] td {
+    min-width: 30px;
+    padding: 5px; } }
 
 .calendar[data-type="year"] .calendar__month {
   text-align: left; }
@@ -99,6 +105,16 @@ td {
 .calendar[data-type="year"] .js-zoom-month {
   cursor: pointer; }
 
+@media (min-width: 800px) {
+  .calendar[data-type="month"] {
+    font-size: 32px; } }
+
+@media (min-width: 800px) {
+  .calendar[data-type="month"] td {
+    min-width: 60px;
+    min-height: 60px;
+    padding: 15px; } }
+
 .calendar[data-type="month"] td[data-day-index] {
   color: #666; }
 
@@ -111,8 +127,18 @@ td {
 .calendar[data-type="month"] .js-zoom-day {
   cursor: pointer; }
 
+@media (min-width: 800px) {
+  .calendar[data-type="day"] {
+    font-size: 32px; } }
+
 .calendar[data-type="day"] .is-center {
   background-color: skyblue; }
+
+@media (min-width: 800px) {
+  .calendar[data-type="day"] td {
+    min-width: 60px;
+    min-height: 60px;
+    padding: 15px; } }
 
 .calendar[data-type="day"] td[data-day-index] {
   color: #666; }
