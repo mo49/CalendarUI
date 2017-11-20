@@ -40,7 +40,7 @@ class CalendarManager {
     
         // 月間カレンダーの中の日にちをクリック
         $(document).delegate(zoomDay, 'click', evt => {
-            let monthIndex = $(`${CALENDAR_MONTH} table`).attr("data-month-index") | 0;
+            let monthIndex = $(`${CALENDAR_MONTH} .calendar__month`).attr("data-month-index") | 0;
             let dayIndex = evt.currentTarget.getAttribute("data-day-index") | 0;
             calendar.createDayCalendar($(CALENDAR_DAY), monthIndex, dayIndex);
         })

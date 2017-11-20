@@ -11,7 +11,7 @@ export default class OneLiner {
     createOneLiner(monthIndex, dayIndex) {
 
         // 選択している日が中央にくる
-        this.$table = $(`<table><tr></tr></table>`);
+        this.$table = $(`<div></div>`);
         const selectedDate = new Date(ds.year, monthIndex - 1, dayIndex);
         const dayNum = new Date(ds.year, monthIndex, 0).getDate();
         const centerId = Math.ceil(this.info.dayRange / 2); // 5 -> 3
@@ -23,7 +23,7 @@ export default class OneLiner {
 
         for (let i = 1; i <= this.info.dayRange; i++) {
             let dayIndex = startDayIndex + i;
-            let $td = $(`<td data-oneliner-index="${i}"></td>`);
+            let $td = $(`<span class="calendar__day" data-oneliner-index="${i}"></span>`);
             if(i === centerId){
                 $td.addClass("is-center");
             }
@@ -38,20 +38,20 @@ export default class OneLiner {
 
     insertMonthLabel(month) {
         let $tr = 
-            $(`<tr class="calendar__month" data-month-index="${month}">
-                <td colspan="${this.info.columnNum}">
+            $(`<div class="calendar__month" data-month-index="${month}">
+                <span>
                     ${this.info.label.month[month-1]}
-                </td>
-            </tr>`);
+                </span>
+            </div>`);
         this.$table.append($tr);
     }
 
     insertWeekLabel(firstDayOfWeekIndex) {
         let week = info.week[this.info.lang.week];
-        let $tr = $(`<tr class="calendar__week"></tr>`);
+        let $tr = $(`<div class="calendar__week"></div>`);
         for (let i = 0; i < this.info.dayRange; i++) {
             let key = this.getDayOfWeekIndex(firstDayOfWeekIndex + i);
-            let $td = $(`<td data-dayofweek-type="${key}">${week[key][key]}</td>`);
+            let $td = $(`<span class="calendar__week__day" data-dayofweek-type="${key}">${week[key][key]}</span>`);
             $tr.append($td);
         }
         this.$table.append($tr);

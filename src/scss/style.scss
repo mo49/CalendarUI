@@ -8,14 +8,18 @@
 @import 'module/*';
 
  *{
-     box-sizing: border-box;
+    box-sizing: border-box;
+    -webkit-overflow-scrolling: touch;
+    -webkit-text-size-adjust: 100%;
+    -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+    outline: none;
  }
 
  .calendar__wrapper{
     background-color: #fafafa;
     text-align: center;
     @include pc-layout{
-        width: 800px;
+        width: 760px;
     }
     @include sp-layout{
         width: 375px;
@@ -23,63 +27,89 @@
  }
 
 .calendar{
-
-}
-.calendar__year{
-    font-size: 24px;
-    margin-top: 30px;
-}
-
-table{
-    display: inline-block;
-    vertical-align: top;
-    border: 1px solid #000;
-    margin: 10px;
-    text-align: center;
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
     @include pc-layout{
+        padding-top: 60px;
     }
     @include sp-layout{
+        padding-top: 30px;
     }
 }
-
-tr{
-    &.calendar__month{
-        font-weight: bold;
+.calendar__year{
+    width: 100%;
+    @include pc-layout{
+        margin-bottom: 30px;
+        font-size: 32px;
     }
-    &.calendar__week{
-        font-style: italic;
-    }
-}
-
-
-td{
-    @for $i from 0 through 6 {
-        &[data-dayofweek-type="#{$i}"]{
-
-        }
-    }
-
-    &.is-today{
-        background-color: orange;
+    @include sp-layout{
+        margin-bottom: 15px;
+        font-size: 16px;
     }
 }
+.calendar__table{
+    display: inline-block;
+}
+.calendar__month{
+    // display: inline-block;
+}
+.calendar__week{
+    font-style: italic;
+    &__day{
+        display: inline-block;
+    }
+}
+.calendar__day{
+    text-align: center;
+    display: inline-block;
+    vertical-align: bottom;
+}
 
+.is-today{
+    background-color: orange;
+}
 
 .calendar[data-type="year"]{
+    $size_l: 30px;
+    $size_s: 30px;
     @include pc-layout{
         font-size: 12px;
     }
-    td{
+    @include sp-layout{
+        font-size: 10px;
+    }
+    .calendar__table{
         @include pc-layout{
-            min-width: 30px;
+            padding: 15px;
+        }
+        @include sp-layout{
             padding: 5px;
         }
     }
     .calendar__month{
         text-align: left;
+        @include pc-layout{
+            margin: 0 0 4px 6px;
+        }
+        @include sp-layout{
+            margin: 0 0 2px 3px;
+        }
     }
     .calendar__week{
         display: none;
+    }
+    .calendar__day{
+        @include pc-layout{
+            width: $size_l;
+            height: $size_l;
+            line-height: $size_l;
+        }
+        @include sp-layout{
+            width: $size_s;
+            height: $size_s;
+            line-height: $size_s;
+        }
     }
     .is-thisMonth{
         color: orange;
@@ -89,14 +119,24 @@ td{
     }
 }
 .calendar[data-type="month"]{
+    $size_l: 80px;
+    $size_s: 40px;
     @include pc-layout{
         font-size: 32px;
     }
-    td{
+    .calendar__month{
+    }
+    .calendar__week__day,
+    .calendar__day{
         @include pc-layout{
-            min-width: 60px;
-            min-height: 60px;
-            padding: 15px;
+            width: $size_l;
+            height: $size_l;
+            line-height: $size_l;
+        }
+        @include sp-layout{
+            width: $size_s;
+            height: $size_s;
+            line-height: $size_s;
         }
         // 日付部分
         &[data-day-index]{
@@ -116,30 +156,10 @@ td{
     }
 }
 .calendar[data-type="day"]{
-    @include pc-layout{
-        font-size: 32px;
-    }
+    @extend .calendar[data-type="month"];
+
     .is-center{
         background-color: skyblue;
-    }
-    td{
-        @include pc-layout{
-            min-width: 60px;
-            min-height: 60px;
-            padding: 15px;
-        }
-        // 日付部分
-        &[data-day-index]{
-            color: #666;
-        }
-        // 日
-        &[data-dayofweek-type="0"]{
-            color: red;
-        }
-        // 土
-        &[data-dayofweek-type="6"]{
-            color: blue;
-        }
     }
     .js-change-day{
         cursor: pointer;

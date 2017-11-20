@@ -30,18 +30,18 @@ export default class Month {
     }
 
     createTable(month, rowNum, cells) {
-        let $table = $(`<table class="js-zoom-month" data-month-index="${month}"><tbody></tbody></table>`);
+        let $table = $(`<div class="calendar__table js-zoom-month" data-month-index="${month}"></div>`);
         this.insertMonthLabel($table, month);
         this.insertWeekLabel($table);
 
         for(let i = 0; i < rowNum; i++) {
-            let $tr = $(`<tr data-week-index="${i+1}"></tr>`);
+            let $tr = $(`<div data-week-index="${i+1}"></div>`);
             for(let j = 0; j < this.info.columnNum; j++) {
                 let cellIndex = j+(i*this.info.columnNum);
                 let day = cells[cellIndex];
                 let $td = day 
-                    ? $(`<td class="js-zoom-day" data-day-index="${day}" data-dayofweek-type="${(cellIndex-this.info.firstDayOfWeekOffset)%this.info.columnNum}">${day}</td>`)
-                    : $(`<td></td>`);
+                    ? $(`<span class="calendar__day js-zoom-day" data-day-index="${day}" data-dayofweek-type="${(cellIndex-this.info.firstDayOfWeekOffset)%this.info.columnNum}">${day}</span>`)
+                    : $(`<span class="calendar__day" ></span>`);
                 if(month === ds.month && day === ds.today){
                     $td.addClass("is-today");
                 }
@@ -53,20 +53,20 @@ export default class Month {
     }
 
     insertMonthLabel($table, month) {
-        let $tr = $(`<tr class="calendar__month" data-month-index="${month}">
-                        <td colspan="${this.info.columnNum}" class="${month === ds.month ? 'is-thisMonth' : ''}">
+        let $tr = $(`<div class="calendar__month" data-month-index="${month}">
+                        <span class="${month === ds.month ? 'is-thisMonth' : ''}">
                             ${this.info.label.month[month-1]}
-                        </td>
-                    </tr>`);
+                        </span>
+                    </div>`);
         $table.append($tr);
     }
 
     insertWeekLabel($table) {
-        let $tr = $(`<tr class="calendar__week"></tr>`);
+        let $tr = $(`<div class="calendar__week"></div>`);
         _.each(this.info.label.week, (elm,index) => {
             let key = Object.keys(elm)[0];
             $tr.append(
-                $(`<td data-dayofweek-type="${key}">${elm[key]}</td>`)
+                $(`<span class="calendar__week__day" data-dayofweek-type="${key}">${elm[key]}</span>`)
             )
         })
         $table.append($tr);

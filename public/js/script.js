@@ -22965,7 +22965,7 @@ var CalendarManager = function () {
 
             // 月間カレンダーの中の日にちをクリック
             (0, _jquery2.default)(document).delegate(zoomDay, 'click', function (evt) {
-                var monthIndex = (0, _jquery2.default)(CALENDAR_MONTH + ' table').attr("data-month-index") | 0;
+                var monthIndex = (0, _jquery2.default)(CALENDAR_MONTH + ' .calendar__month').attr("data-month-index") | 0;
                 var dayIndex = evt.currentTarget.getAttribute("data-day-index") | 0;
                 calendar.createDayCalendar((0, _jquery2.default)(CALENDAR_DAY), monthIndex, dayIndex);
             });
@@ -23055,16 +23055,16 @@ var Month = function () {
     }, {
         key: 'createTable',
         value: function createTable(month, rowNum, cells) {
-            var $table = (0, _jquery2.default)('<table class="js-zoom-month" data-month-index="' + month + '"><tbody></tbody></table>');
+            var $table = (0, _jquery2.default)('<div class="calendar__table js-zoom-month" data-month-index="' + month + '"></div>');
             this.insertMonthLabel($table, month);
             this.insertWeekLabel($table);
 
             for (var i = 0; i < rowNum; i++) {
-                var $tr = (0, _jquery2.default)('<tr data-week-index="' + (i + 1) + '"></tr>');
+                var $tr = (0, _jquery2.default)('<div data-week-index="' + (i + 1) + '"></div>');
                 for (var j = 0; j < this.info.columnNum; j++) {
                     var cellIndex = j + i * this.info.columnNum;
                     var day = cells[cellIndex];
-                    var $td = day ? (0, _jquery2.default)('<td class="js-zoom-day" data-day-index="' + day + '" data-dayofweek-type="' + (cellIndex - this.info.firstDayOfWeekOffset) % this.info.columnNum + '">' + day + '</td>') : (0, _jquery2.default)('<td></td>');
+                    var $td = day ? (0, _jquery2.default)('<span class="calendar__day js-zoom-day" data-day-index="' + day + '" data-dayofweek-type="' + (cellIndex - this.info.firstDayOfWeekOffset) % this.info.columnNum + '">' + day + '</span>') : (0, _jquery2.default)('<span class="calendar__day" ></span>');
                     if (month === _DateSingleton2.default.month && day === _DateSingleton2.default.today) {
                         $td.addClass("is-today");
                     }
@@ -23077,16 +23077,16 @@ var Month = function () {
     }, {
         key: 'insertMonthLabel',
         value: function insertMonthLabel($table, month) {
-            var $tr = (0, _jquery2.default)('<tr class="calendar__month" data-month-index="' + month + '">\n                        <td colspan="' + this.info.columnNum + '" class="' + (month === _DateSingleton2.default.month ? 'is-thisMonth' : '') + '">\n                            ' + this.info.label.month[month - 1] + '\n                        </td>\n                    </tr>');
+            var $tr = (0, _jquery2.default)('<div class="calendar__month" data-month-index="' + month + '">\n                        <span class="' + (month === _DateSingleton2.default.month ? 'is-thisMonth' : '') + '">\n                            ' + this.info.label.month[month - 1] + '\n                        </span>\n                    </div>');
             $table.append($tr);
         }
     }, {
         key: 'insertWeekLabel',
         value: function insertWeekLabel($table) {
-            var $tr = (0, _jquery2.default)('<tr class="calendar__week"></tr>');
+            var $tr = (0, _jquery2.default)('<div class="calendar__week"></div>');
             _lodash2.default.each(this.info.label.week, function (elm, index) {
                 var key = (0, _keys2.default)(elm)[0];
-                $tr.append((0, _jquery2.default)('<td data-dayofweek-type="' + key + '">' + elm[key] + '</td>'));
+                $tr.append((0, _jquery2.default)('<span class="calendar__week__day" data-dayofweek-type="' + key + '">' + elm[key] + '</span>'));
             });
             $table.append($tr);
         }
@@ -23153,7 +23153,7 @@ var OneLiner = function () {
         value: function createOneLiner(monthIndex, dayIndex) {
 
             // 選択している日が中央にくる
-            this.$table = (0, _jquery2.default)('<table><tr></tr></table>');
+            this.$table = (0, _jquery2.default)('<div></div>');
             var selectedDate = new Date(_DateSingleton2.default.year, monthIndex - 1, dayIndex);
             var dayNum = new Date(_DateSingleton2.default.year, monthIndex, 0).getDate();
             var centerId = Math.ceil(this.info.dayRange / 2); // 5 -> 3
@@ -23165,7 +23165,7 @@ var OneLiner = function () {
 
             for (var i = 1; i <= this.info.dayRange; i++) {
                 var _dayIndex = startDayIndex + i;
-                var $td = (0, _jquery2.default)('<td data-oneliner-index="' + i + '"></td>');
+                var $td = (0, _jquery2.default)('<span class="calendar__day" data-oneliner-index="' + i + '"></span>');
                 if (i === centerId) {
                     $td.addClass("is-center");
                 }
@@ -23180,17 +23180,17 @@ var OneLiner = function () {
     }, {
         key: 'insertMonthLabel',
         value: function insertMonthLabel(month) {
-            var $tr = (0, _jquery2.default)('<tr class="calendar__month" data-month-index="' + month + '">\n                <td colspan="' + this.info.columnNum + '">\n                    ' + this.info.label.month[month - 1] + '\n                </td>\n            </tr>');
+            var $tr = (0, _jquery2.default)('<div class="calendar__month" data-month-index="' + month + '">\n                <span>\n                    ' + this.info.label.month[month - 1] + '\n                </span>\n            </div>');
             this.$table.append($tr);
         }
     }, {
         key: 'insertWeekLabel',
         value: function insertWeekLabel(firstDayOfWeekIndex) {
             var week = _info2.default.week[this.info.lang.week];
-            var $tr = (0, _jquery2.default)('<tr class="calendar__week"></tr>');
+            var $tr = (0, _jquery2.default)('<div class="calendar__week"></div>');
             for (var i = 0; i < this.info.dayRange; i++) {
                 var key = this.getDayOfWeekIndex(firstDayOfWeekIndex + i);
-                var $td = (0, _jquery2.default)('<td data-dayofweek-type="' + key + '">' + week[key][key] + '</td>');
+                var $td = (0, _jquery2.default)('<span class="calendar__week__day" data-dayofweek-type="' + key + '">' + week[key][key] + '</span>');
                 $tr.append($td);
             }
             this.$table.append($tr);
